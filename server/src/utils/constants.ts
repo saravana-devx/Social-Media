@@ -27,7 +27,7 @@ const RESPONSE_MESSAGES = {
     EMAIL_NOT_FOUND: "Email not found",
     EMAIL_ALREADY_IN_USE: "Email is already in use.",
     USERNAME_ALREADY_IN_USE: "User name is already in use",
-    INVALID_PASSWORD: "Invalid password.",
+    INVALID_PASSWORD: "Invalid password",
     MISSING_TOKEN: "Token is missing.",
     EMAIL_SENT: "Email sent successfully",
     EMAIL_VERIFIED: "Email verified successfully",

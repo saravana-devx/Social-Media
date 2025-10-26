@@ -6,6 +6,7 @@ import ForgetPassword from "./pages/auth/ForgetPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/HomePage";
+import VerifyOtp from "./pages/auth/VerifyOtp";
 
 function App() {
   return (
@@ -15,13 +16,12 @@ function App() {
           {/* OPEN ROUTES */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<Home />} />
-
+          <Route path="/verify-otp" element={<VerifyOtp />} />
           {/* AUTH ROUTES */}
           <Route path="/register" element={<Register />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/forgot-password" element={<ForgetPassword />}></Route>
           <Route path="/reset-password" element={<ResetPassword />}></Route>
-
 
           {/* OTHER ROUTES */}
         </Routes>

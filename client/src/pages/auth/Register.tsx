@@ -12,13 +12,19 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { AuthAPI } from "@/api/auth/AuthAPI";
 import { toast } from "sonner";
 import axios from "axios";
 
-// ✅ Validation schema
+//Validation schema
 const formSchema = z.object({
   userName: z.string().min(4, "Username must be at least 4 characters"),
   email: z.string().email("Invalid email address"),
@@ -26,7 +32,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-
 
 const Register: React.FC = () => {
   const form = useForm<FormValues>({
@@ -41,16 +46,13 @@ const Register: React.FC = () => {
       const result = await AuthAPI.register(values);
       localStorage.setItem("token", result.data.token);
       toast.success("Registered successfully!");
-      navigate("/");
+      navigate("/verify-otp");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const statusCode = error.response.data?.status;
         switch (statusCode) {
           case 400:
             toast.error("Provide credentials.");
-            break;
-          case 404:
-            toast.error("Check credentials.");
             break;
           case 409:
             toast.error("Email or username already in use.");
@@ -66,7 +68,9 @@ const Register: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
       <Card className="w-full max-w-md p-6 md:p-8 shadow-xl rounded-3xl border border-gray-200 dark:border-gray-700">
         <CardHeader className="text-center mb-6">
-          <CardTitle className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent leading-tight`}>
+          <CardTitle
+            className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent leading-tight`}
+          >
             Create Your Account
           </CardTitle>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
@@ -139,7 +143,7 @@ const Register: React.FC = () => {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className={`w-full py-4 rounded-xl text-white shadow-lg font-semibold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600 transition-all`}
+                className="w-full py-4 rounded-xl text-white shadow-lg font-semibold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600 transition-all"
               >
                 Sign Up
               </Button>
@@ -162,4 +166,3 @@ const Register: React.FC = () => {
 };
 
 export default Register;
-
