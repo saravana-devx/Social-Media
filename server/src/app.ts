@@ -58,14 +58,22 @@ app.use(
 
 // CORS
 const allowedOrigins: string[] =
-  process.env.NODE_ENV === "production"
-    ? [process.env.Frontend_Production_url || ""]
+  process.env.NODE_ENV === "production" && process.env.Frontend_Production_url
+    ? [process.env.Frontend_Production_url]
     : ["http://localhost:5173"];
-const options: cors.CorsOptions = {
-  origin: allowedOrigins,
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
-app.use(cors(options));
+
+app.use(cors(corsOptions));
 
 // ===============================================
 // Routes will be here
@@ -74,12 +82,10 @@ app.use("/api/v1/auth", authRoute);
 
 app.use(errorMiddleware);
 
-
 //Testing route to check server is running or not
 app.get("/test", function (req: Request, res: Response): void {
   res.send("<h1>Server is running</h1>");
 });
-
 
 //Fallback response if any requested route is not available.
 app.use((req, res) => {

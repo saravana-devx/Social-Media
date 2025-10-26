@@ -29,7 +29,7 @@ const items = [
 
 interface SidebarProps {
     isOpen: boolean;
-    sideBarRef: React.RefObject<HTMLDivElement> | null; // ✅ Fixed here
+    sideBarRef: React.RefObject<HTMLDivElement> | null;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, sideBarRef }) => {

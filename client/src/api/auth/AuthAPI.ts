@@ -2,6 +2,11 @@ import { type AxiosResponse } from "axios";
 import api from "../config/axiosConfig";
 import { AuthURL } from "../config/axiosUtils";
 
+type LoginData = {
+  identifier: string;
+  password: string;
+};
+
 type SignUPData = {
   email: string;
   userName: string;
@@ -9,13 +14,13 @@ type SignUPData = {
 };
 
 type ForgotPassword = {
-  password : string,
-  confirmPassword : string,
-}
+  password: string;
+  confirmPassword: string;
+};
 
 export const AuthAPI = {
   register: async function (data: SignUPData) {
-    console.info(data); 
+    console.info(data);
     const response: AxiosResponse = await api.request({
       url: AuthURL.registerUser,
       method: "POST",
@@ -23,11 +28,11 @@ export const AuthAPI = {
     });
     return response.data;
   },
-  login: async function (identifier: string, password: string) {
+  login: async function (data: LoginData) {
     const response: AxiosResponse = await api.request({
       url: AuthURL.loginUser,
       method: "POST",
-      data: { identifier, password },
+      data,
     });
     return response.data;
   },
@@ -39,14 +44,11 @@ export const AuthAPI = {
     });
     return response.data;
   },
-  resetForgetPassword: async function (
-    data : ForgotPassword,
-    token: string
-  ) {
+  resetForgetPassword: async function (data: ForgotPassword, token: string) {
     const response: AxiosResponse = await api.request({
       url: AuthURL.resetPassword + `?token=${token}`,
       method: "PATCH",
-      data
+      data,
     });
     return response.data;
   },

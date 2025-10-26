@@ -20,7 +20,7 @@ interface RegisterUserInput {
 const generateVerificationToken = (userId: string) => {
   const secret = process.env.JWT_SECRET as jwt.Secret;
   const token = jwt.sign({ userId }, secret, {
-    expiresIn: "1h",
+    expiresIn: "24h",
   });
   return token;
 };
@@ -138,6 +138,7 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
   }
   await User.findByIdAndUpdate(userId, {
     verified: true,
+    verificationToken: "",
   });
 
   const templatePath = path.join(
@@ -146,7 +147,7 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
     "utils",
     "email",
     "templates",
-    "sendOtp.html"
+    "welcomeEmail.html"
   );
   let html = fs
     .readFileSync(templatePath, "utf8")
@@ -164,6 +165,7 @@ export const handleResendOtp = async (userId: Types.ObjectId) => {
     });
   }
 
+  // If already account verified no need to re-send otp
   if (user.verified) {
     throw new ApiError({
       status: HTTP_STATUS.CONFLICT,
@@ -223,7 +225,7 @@ export const handleUserLogin = async (identifier: string, password: string) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new ApiError({
-      status: HTTP_STATUS.CONFLICT,
+      status: HTTP_STATUS.UNAUTHORIZED,
       message: RESPONSE_MESSAGES.USERS.INVALID_PASSWORD,
     });
   }
@@ -283,7 +285,14 @@ export const handleResetPassword = async (
     });
   }
 
-  if (!password || !confirmPassword || password !== confirmPassword) {
+  if (!password || !confirmPassword) {
+    throw new ApiError({
+      status: HTTP_STATUS.BAD_REQUEST,
+      message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+    });
+  }
+
+  if (password !== confirmPassword) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
       message: RESPONSE_MESSAGES.USERS.INVALID_PASSWORD,

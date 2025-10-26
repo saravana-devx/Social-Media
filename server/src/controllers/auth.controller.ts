@@ -113,6 +113,12 @@ export const loginUser = [
 
     // Identifier can be userName or email
     const { identifier, password } = req.body;
+    if (!identifier || !password) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+      });
+    }
     const { token, user } = await handleUserLogin(identifier, password);
 
     res

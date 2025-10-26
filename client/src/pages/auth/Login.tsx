@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { AuthAPI } from "@/api/auth/AuthAPI";
 import { toast } from "sonner";
@@ -36,23 +42,28 @@ const Login: React.FC = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const result = await AuthAPI.login(values.identifier, values.password);
+      const result = await AuthAPI.login(values);
       localStorage.setItem("token", result.data.token);
       toast.success("Logged in successfully!");
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const statusCode = error.response.data?.status;
         switch (statusCode) {
           case 404:
-            toast.error("Email does not exist.");
+            toast.error("User does not exist.");
             break;
-          case 409:
+          case 400:
             toast.error("Please check your credentials.");
+            break;
+          case 401:
+            toast.error("Incorrect password");
             break;
           default:
             toast.error("Login failed. Please check your credentials.");
         }
+      } else {
+        toast.error("Network error. Please try again.");
       }
     }
   };
