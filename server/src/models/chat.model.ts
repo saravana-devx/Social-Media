@@ -1,13 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IChat extends Document {
-  type: "private" | "group";
-  members: Types.ObjectId[];
-  groupId?: Types.ObjectId;
-  lastMessage?: Types.ObjectId;
-  isMuted?: Types.ObjectId[];
-  createdAt: Date;
-}
+import { Schema, model } from "mongoose";
+import { IChat } from "../types/model.types";
 
 const ChatSchema = new Schema<IChat>({
   type: {

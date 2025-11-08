@@ -1,14 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IPost extends Document {
-  userId: Types.ObjectId;
-  postSrc?: string;
-  description?: string;
-  likes: Types.ObjectId[];
-  shares: number;
-  createdAt: Date;
-  comments: Types.ObjectId[];
-}
+import { Schema, model } from "mongoose";
+import { IPost } from "../types/model.types";
 
 const PostSchema = new Schema<IPost>({
   userId: {

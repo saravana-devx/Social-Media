@@ -1,12 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IInteraction extends Document {
-  actorId: Types.ObjectId;
-  targetId: Types.ObjectId;
-  targetType: "post" | "comment" | "story" | "user";
-  type: "like" | "view" | "comment" | "share" | "follow";
-  createdAt: Date;
-}
+import { Schema, model } from "mongoose";
+import { IInteraction } from "../types/model.types";
 
 const InteractionSchema = new Schema<IInteraction>({
   actorId: {

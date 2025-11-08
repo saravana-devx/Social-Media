@@ -1,13 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IComment extends Document {
-  userId: Types.ObjectId;
-  postId: Types.ObjectId;
-  description: string;
-  likes: Types.ObjectId[];
-  createdAt: Date;
-  replies: Types.ObjectId[];
-}
+import { Schema, model } from "mongoose";
+import { IComment } from "../types/model.types";
 
 const CommentSchema = new Schema<IComment>({
   userId: {

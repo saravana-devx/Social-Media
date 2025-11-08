@@ -1,10 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IGroup extends Document {
-  admins: Types.ObjectId[];
-  members: Types.ObjectId[];
-  groupName: string;
-}
+import { Schema, model } from "mongoose";
+import { IGroup } from "../types/model.types";
 
 const GroupSchema = new Schema<IGroup>({
   admins: [
