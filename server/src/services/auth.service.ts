@@ -3,27 +3,26 @@ import path from "path";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
+
 import mailSender from "../utils/email/mailSender";
-import { ApiError } from "../utils/apiResponseHandler/apiError";
-import { HTTP_STATUS, RESPONSE_MESSAGES } from "../utils/constants";
+
 import { Types } from "mongoose";
 import { User } from "../models/user.model";
 import { Otp } from "../models/otp.model";
 
-interface RegisterUserInput {
-  userName: string;
-  email: string;
-  password: string;
-}
+import { ApiError } from "../utils/apiResponseHandler/apiError";
+import {
+  AUTH_MESSAGES,
+  COMMON_MESSAGES,
+  HTTP_STATUS,
+  USER_MESSAGES,
+} from "../utils/constants";
+import { RegisterUserInput, TokenPayload } from "../types/auth.types";
 
-//token generation for verification of email/account
-const generateVerificationToken = (userId: string) => {
-  const secret = process.env.JWT_SECRET as jwt.Secret;
-  const token = jwt.sign({ userId }, secret, {
-    expiresIn: "24h",
-  });
-  return token;
-};
+import {
+  generateLongVerificationToken,
+  generateShortVerificationToken,
+} from "../utils/helper/generateJwtToken";
 
 export const registerNewUser = async ({
   userName,
@@ -34,7 +33,7 @@ export const registerNewUser = async ({
   if (isEmailAlreadyExists) {
     throw new ApiError({
       status: HTTP_STATUS.CONFLICT,
-      message: RESPONSE_MESSAGES.USERS.EMAIL_ALREADY_IN_USE,
+      message: USER_MESSAGES.EMAIL_ALREADY_IN_USE,
     });
   }
 
@@ -43,7 +42,7 @@ export const registerNewUser = async ({
   if (isUserNameAlreadyExists) {
     throw new ApiError({
       status: HTTP_STATUS.CONFLICT,
-      message: RESPONSE_MESSAGES.USERS.USERNAME_ALREADY_IN_USE,
+      message: USER_MESSAGES.USERNAME_ALREADY_IN_USE,
     });
   }
 
@@ -61,7 +60,13 @@ export const registerNewUser = async ({
 
   await user.save();
 
-  return user;
+  // Short 30 minutes token to verify the user account;
+  const tokenPayload: TokenPayload = {
+    id: user._id,
+  };
+  const token = generateShortVerificationToken(tokenPayload);
+
+  return { user, token };
 };
 
 export const handleSendOtp = async (
@@ -74,6 +79,8 @@ export const handleSendOtp = async (
     specialChars: false,
     lowerCaseAlphabets: false,
   });
+
+  console.log("sent OTP : ", otpNumber);
 
   await Otp.create({
     userId: userId,
@@ -101,7 +108,7 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USERS.NOT_FOUND,
+      message: USER_MESSAGES.NOT_FOUND,
     });
   }
 
@@ -109,7 +116,7 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
   if (user.verified) {
     throw new ApiError({
       status: HTTP_STATUS.CONFLICT,
-      message: RESPONSE_MESSAGES.USERS.ALREADY_VERIFIED,
+      message: AUTH_MESSAGES.ALREADY_EMAIL_VERIFIED,
     });
   }
 
@@ -123,17 +130,17 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
   if (!otp) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
-      message: RESPONSE_MESSAGES.USERS.REQUEST_NEW_OTP,
+      message: AUTH_MESSAGES.REQUEST_NEW_OTP,
     });
   }
 
   // get otpNumber from otp stored in database
   const latestOtp = otp.otp;
 
-  if (latestOtp !== otpNumber) {
+  if (latestOtp !== Number(otpNumber)) {
     throw new ApiError({
       status: HTTP_STATUS.FORBIDDEN,
-      message: RESPONSE_MESSAGES.USERS.WRONG_OTP,
+      message: AUTH_MESSAGES.WRONG_OTP,
     });
   }
   await User.findByIdAndUpdate(userId, {
@@ -153,15 +160,22 @@ export const handleVerifyOtp = async (userId: string, otpNumber: number) => {
     .readFileSync(templatePath, "utf8")
     .replace(/{{userName}}/g, user.userName);
   await mailSender(user.email, "Welcome By Social Media", html);
+
+  const payload: TokenPayload = {
+    id: user._id,
+  };
+
+  const token = generateLongVerificationToken(payload);
+  return token;
 };
 
-export const handleResendOtp = async (userId: Types.ObjectId) => {
+export const handleResendOtp = async (userId: string) => {
   const user = await User.findById(userId);
 
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USERS.NOT_FOUND,
+      message: USER_MESSAGES.NOT_FOUND,
     });
   }
 
@@ -169,7 +183,7 @@ export const handleResendOtp = async (userId: Types.ObjectId) => {
   if (user.verified) {
     throw new ApiError({
       status: HTTP_STATUS.CONFLICT,
-      message: RESPONSE_MESSAGES.USERS.ALREADY_VERIFIED,
+      message: AUTH_MESSAGES.ALREADY_EMAIL_VERIFIED,
     });
   }
 
@@ -179,6 +193,8 @@ export const handleResendOtp = async (userId: Types.ObjectId) => {
     specialChars: false,
     lowerCaseAlphabets: false,
   });
+
+  console.log("Resent OTP : ", otpNumber);
 
   await Otp.create({
     userId: userId,
@@ -218,7 +234,7 @@ export const handleUserLogin = async (identifier: string, password: string) => {
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USERS.NOT_FOUND,
+      message: USER_MESSAGES.NOT_FOUND,
     });
   }
 
@@ -226,17 +242,16 @@ export const handleUserLogin = async (identifier: string, password: string) => {
   if (!isMatch) {
     throw new ApiError({
       status: HTTP_STATUS.UNAUTHORIZED,
-      message: RESPONSE_MESSAGES.USERS.INVALID_PASSWORD,
+      message: AUTH_MESSAGES.INVALID_PASSWORD,
     });
   }
 
-  const secret = process.env.JWT_SECRET as string;
-  const tokenPayload = {
-    email: user.email,
+  const tokenPayload: TokenPayload = {
+    // email: user.email,
     id: user._id,
-    role: user.accountType,
+    // role: user.accountType,
   };
-  const token = jwt.sign(tokenPayload, secret, { expiresIn: "24h" });
+  const token = generateLongVerificationToken(tokenPayload);
 
   user.password = "";
   return { token, user };
@@ -247,14 +262,15 @@ export const handleSendPasswordResetEmail = async (email: string) => {
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USERS.NOT_FOUND,
+      message: USER_MESSAGES.NOT_FOUND,
     });
   }
 
-  // const token = generateVerificationToken(user._id.toString());
-  const token = generateVerificationToken(
-    (user._id as Types.ObjectId).toString()
-  );
+  const payload = {
+    id: user._id,
+    email: email,
+  };
+  const token = generateShortVerificationToken(payload);
 
   user.verificationToken = token;
   await user.save();
@@ -281,21 +297,21 @@ export const handleResetPassword = async (
   if (!token) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
-      message: RESPONSE_MESSAGES.USERS.MISSING_TOKEN,
+      message: AUTH_MESSAGES.MISSING_TOKEN,
     });
   }
 
   if (!password || !confirmPassword) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
-      message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+      message: COMMON_MESSAGES.REQUIRED_FIELDS,
     });
   }
 
   if (password !== confirmPassword) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
-      message: RESPONSE_MESSAGES.USERS.INVALID_PASSWORD,
+      message: AUTH_MESSAGES.INVALID_PASSWORD,
     });
   }
 
@@ -306,7 +322,7 @@ export const handleResetPassword = async (
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USERS.NOT_FOUND,
+      message: USER_MESSAGES.NOT_FOUND,
     });
   }
 

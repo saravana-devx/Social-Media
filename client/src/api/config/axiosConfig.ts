@@ -2,10 +2,9 @@ import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 
 const BACKEND_URL =
-  import.meta.env.MODE === 'production'
+  import.meta.env.MODE === "production"
     ? `${import.meta.env.VITE_BACKEND_URL}`
-    : 'http://localhost:4000';
-
+    : "http://localhost:4000";
 
 export const api = axios.create({
   withCredentials: true,
@@ -25,16 +24,18 @@ const errorHandler = (error: AxiosError): Promise<never> => {
         "Unable to reach the server. Please check your internet connection or try again later."
       );
     } else {
-      window.location.href = "/error";
-      toast.error("An unexpected error occurred. Please try again.");
+      localStorage.clear();
+      window.location.href = "/auth/login";
     }
-  }
-  else {
+  } else {
     switch (statusCode) {
       case 401:
         toast.error("Unauthorized. Redirecting to login...");
         localStorage.clear();
         window.location.href = "/login"; // Redirect user
+        break;
+      case 404:
+        toast.error("Resource not found.");
         break;
       case 500:
         toast.error("Server error. Please try again later.");
@@ -43,8 +44,7 @@ const errorHandler = (error: AxiosError): Promise<never> => {
         toast("Too Many Requests! Please try again later.");
         break;
       default:
-      // window.location.href = "/error";
-      // toast.error("An unexpected error occurred. Please try again.");
+        toast.error(error.response?.statusText || "An error occurred.");
     }
   }
   return Promise.reject(error);

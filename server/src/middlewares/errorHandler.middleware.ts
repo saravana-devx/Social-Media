@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
-import { HTTP_STATUS, RESPONSE_MESSAGES } from "../utils/constants";
+import { COMMON_MESSAGES, HTTP_STATUS,  } from "../utils/constants";
 
 const errorMiddleware = (
   err: ApiError,
@@ -10,7 +10,7 @@ const errorMiddleware = (
 ) => {
   const response = {
     status: err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    message: err.message || RESPONSE_MESSAGES.COMMON.INTERNAL_SERVER_ERROR,
+    message: err.message || COMMON_MESSAGES.INTERNAL_SERVER_ERROR,
     errors: err.errors && err.errors.length > 0 ? err.errors : undefined,
   };
 

@@ -1,16 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface ICall extends Document {
-  chatId: Types.ObjectId;
-  callerId: Types.ObjectId;
-  receiverIds: Types.ObjectId[];
-  callType: "audio" | "video";
-  status: "ongoing" | "missed" | "ended";
-  startedAt: Date;
-  endedAt?: Date;
-  duration?: number;
-  callLogMessageId?: Types.ObjectId;
-}
+import { Schema, model } from "mongoose";
+import { ICall } from "../types/model.types";
 
 const CallSchema = new Schema<ICall>({
   chatId: {

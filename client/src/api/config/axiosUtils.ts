@@ -14,4 +14,6 @@ export const AuthURL = {
   loginUser: "/auth/login",
   sendPasswordLink: "/auth/send-password-reset-email",
   resetPassword: "/auth/reset-password",
+  verifyOtp: "/auth/verify-otp",
+  resendOtp: "/auth/resend-otp",
 };

@@ -1,15 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface INotification extends Document {
-  userId: Types.ObjectId;
-  type: "chat" | "call" | "friend_request" | "post" | "system";
-  content: string;
-  relatedId: Types.ObjectId;
-  relatedModel: "chat" | "call" | "friend_request" | "post" | "system";
-  isRead: boolean;
-  createdAt: Date;
-  expiresAt: Date;
-}
+import { Schema, model } from "mongoose";
+import { INotification } from "../types/model.types";
 
 const NotificationSchema = new Schema<INotification>({
   userId: {

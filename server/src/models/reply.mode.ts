@@ -1,12 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IReply extends Document {
-  commentId: Types.ObjectId;
-  userId: Types.ObjectId;
-  description: string;
-  likes: Types.ObjectId[];
-  createdAt: Date;
-}
+import { Schema, model } from "mongoose";
+import { IReply } from "../types/model.types";
 
 const ReplySchema = new Schema<IReply>({
   commentId: {

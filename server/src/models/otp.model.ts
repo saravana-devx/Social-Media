@@ -1,11 +1,5 @@
-import { Document, model, Schema, Types } from "mongoose";
-
-export interface IOtp extends Document {
-  userId: Types.ObjectId;
-  otp: number;
-  createdAt: Date;
-  expiresAt: Date;
-}
+import { model, Schema } from "mongoose";
+import { IOtp } from "../types/model.types";
 
 const otpSchema = new Schema<IOtp>({
   userId: {

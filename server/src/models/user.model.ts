@@ -1,21 +1,5 @@
-import { Schema, Document, model, Types } from "mongoose";
-import cron from "node-cron";
-
-export interface IUser extends Document {
-  userName: string;
-  email: string;
-  password: string;
-  verified: boolean;
-  accountType: "Admin" | "User";
-  verificationToken?: string;
-  verificationExpires: Date;
-  profileImage: string;
-  about?: string;
-  location?: string;
-  joiningDate: Date;
-  friends: Types.ObjectId[];
-  savedPosts: Types.ObjectId[];
-}
+import { Schema,  model } from "mongoose";
+import { IUser } from "../types/model.types";
 
 const userSchema = new Schema<IUser>(
   {
@@ -37,7 +21,7 @@ const userSchema = new Schema<IUser>(
     accountType: {
       type: String,
       enum: ["Admin", "User"],
-      default : "User"
+      default: "User",
     },
     verified: {
       type: Boolean,
@@ -46,9 +30,10 @@ const userSchema = new Schema<IUser>(
     verificationToken: {
       type: String,
     },
+    // To delete the user profile from table
     verificationExpires: {
       type: Date,
-      default: () => new Date(Date.now() +  24 * 60 * 60 * 1000), // 24 hours
+      default: () => new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
     },
     profileImage: String,
     about: String,

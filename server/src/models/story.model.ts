@@ -1,11 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IStory extends Document {
-  userId: Types.ObjectId;
-  mediaUrl: string;
-  views: Types.ObjectId[];
-  createdAt: Date;
-}
+import { model, Schema } from "mongoose";
+import { IStory } from "../types/model.types";
 
 const StorySchema = new Schema<IStory>({
   userId: {

@@ -1,11 +1,5 @@
-import { Schema, model, Types, Document } from "mongoose";
-
-export interface IFriendRequest extends Document {
-  from: Types.ObjectId;
-  to: Types.ObjectId;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: Date;
-}
+import { Schema, model } from "mongoose";
+import { IFriendRequest } from "../types/model.types";
 
 const FriendRequestSchema = new Schema<IFriendRequest>({
   from: {

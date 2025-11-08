@@ -3,7 +3,12 @@ import asyncHandler from "../middlewares/asyncHandler.middleware";
 import { body, validationResult } from "express-validator";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
 import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
-import { HTTP_STATUS, RESPONSE_MESSAGES } from "../utils/constants";
+import {
+  HTTP_STATUS,
+  AUTH_MESSAGES,
+  COMMON_MESSAGES,
+  USER_MESSAGES,
+} from "../utils/constants";
 import {
   registerNewUser,
   handleUserLogin,
@@ -13,7 +18,10 @@ import {
   handleVerifyOtp,
   handleResendOtp,
 } from "../services/auth.service";
-import { Types } from "mongoose";
+import {
+  longLivedCookieOptions,
+  shortLivedCookieOptions,
+} from "../utils/helper/generateJwtToken";
 
 export const registerUser = [
   body("userName")
@@ -30,7 +38,7 @@ export const registerUser = [
     if (!userName || !email || !password) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+        message: COMMON_MESSAGES.REQUIRED_FIELDS,
       });
     }
     const errors = validationResult(req);
@@ -41,59 +49,67 @@ export const registerUser = [
       });
     }
 
-    const user = await registerNewUser({
+    const { user, token } = await registerNewUser({
       userName,
       email,
       password,
     });
-    await handleSendOtp(user._id as Types.ObjectId, email, userName);
 
-    res.status(HTTP_STATUS.CREATED).json(
-      new ApiResponse({
-        status: HTTP_STATUS.CREATED,
-        message: RESPONSE_MESSAGES.USERS.REGISTER,
-        data: { user },
-      })
-    );
+    await handleSendOtp(user._id, email, userName);
+
+    res
+      .cookie("verification_token", token, shortLivedCookieOptions)
+      .status(HTTP_STATUS.CREATED)
+      .json(
+        new ApiResponse({
+          status: HTTP_STATUS.CREATED,
+          message: USER_MESSAGES.REGISTER,
+          data: { user },
+        })
+      );
   }),
 ];
 
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
-  const { userId, otp } = req.body;
+  const { otp } = req.body;
 
-  if (!userId || !otp) {
+  const { id } = req.currentUser;
+
+  if (!otp) {
     throw new ApiError({
       status: HTTP_STATUS.BAD_REQUEST,
-      message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+      message: COMMON_MESSAGES.REQUIRED_FIELDS,
     });
   }
 
-  await handleVerifyOtp(userId, otp);
+  const authToken = await handleVerifyOtp(id, otp);
 
-  res.status(HTTP_STATUS.CREATED).json(
-    new ApiResponse({
-      status: HTTP_STATUS.CREATED,
-      message: RESPONSE_MESSAGES.USERS.OTP_VERIFIED,
+  res
+    .cookie("verification_token", "", {
+      httpOnly: true,
+      expires: new Date(0), // delete old token
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     })
-  );
+    .cookie("auth_token", authToken, longLivedCookieOptions)
+    .status(HTTP_STATUS.CREATED)
+    .json(
+      new ApiResponse({
+        status: HTTP_STATUS.CREATED,
+        message: AUTH_MESSAGES.OTP_VERIFIED,
+      })
+    );
 });
 
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
-  const { userId } = req.body;
+  const { id } = req.currentUser;
 
-  if (!userId) {
-    throw new ApiError({
-      status: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
-    });
-  }
-
-  await handleResendOtp(userId as Types.ObjectId);
+  await handleResendOtp(id);
 
   res.status(HTTP_STATUS.CREATED).json(
     new ApiResponse({
       status: HTTP_STATUS.OK,
-      message: RESPONSE_MESSAGES.USERS.OTP_RESENT,
+      message: AUTH_MESSAGES.OTP_RESENT,
     })
   );
 });
@@ -116,21 +132,18 @@ export const loginUser = [
     if (!identifier || !password) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: RESPONSE_MESSAGES.COMMON.REQUIRED_FIELDS,
+        message: COMMON_MESSAGES.REQUIRED_FIELDS,
       });
     }
     const { token, user } = await handleUserLogin(identifier, password);
 
     res
-      .cookie("token", token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        httpOnly: true,
-      })
+      .cookie("auth_token", token, longLivedCookieOptions)
       .status(HTTP_STATUS.OK)
       .json(
         new ApiResponse({
           status: HTTP_STATUS.OK,
-          message: RESPONSE_MESSAGES.USERS.LOGIN,
+          message: AUTH_MESSAGES.LOGIN,
           data: { token, user },
         })
       );
@@ -154,7 +167,7 @@ export const sendPasswordResetEmail = [
     res.status(HTTP_STATUS.OK).json(
       new ApiResponse({
         status: HTTP_STATUS.OK,
-        message: RESPONSE_MESSAGES.USERS.EMAIL_SENT,
+        message: AUTH_MESSAGES.EMAIL_SENT,
       })
     );
   }),
@@ -170,7 +183,7 @@ export const resetPassword = asyncHandler(
     res.status(HTTP_STATUS.OK).json(
       new ApiResponse({
         status: HTTP_STATUS.OK,
-        message: RESPONSE_MESSAGES.USERS.PASSWORD_UPDATED,
+        message: AUTH_MESSAGES.PASSWORD_UPDATED,
       })
     );
   }
