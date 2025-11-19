@@ -8,9 +8,9 @@ export {
   useResendOtpMutation,
   useSendPasswordLinkMutation,
   useResetPasswordMutation,
-} from "./hooks/useAuthQuery";
+} from "./hooks/useAuthMutations";
 
-export * from "./utils/handleAxiosError";
+export * from "../../utils/handleAxiosError";
 
 export * from "./validation";
 export * from "./types";

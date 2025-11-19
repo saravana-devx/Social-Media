@@ -1,19 +1,20 @@
-import Cookies from "js-cookie";
+import { useCurrentUserQuery } from "@/features/profile/hooks/useUserProfile";
 import React from "react";
-import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const token = Cookies.get("auth_token");
+import { Navigate } from "react-router-dom";
 
-  if (!token) {
-    return <Navigate to="/auth/login" replace />;
-  }
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { data: user, isLoading } = useCurrentUserQuery();
 
-  return <>{children}</>;
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!user) return <Navigate to="/auth/login" replace />;
+
+  return children;
 };
 
 export default ProtectedRoute;

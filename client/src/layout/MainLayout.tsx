@@ -1,24 +1,42 @@
-import React, { useRef, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-// import Footer from "@/components/layout/Footer";
-import Sidebar from "@/components/layout/SideBar";
+import RightSideBar from "@/components/layout/RightSideBar";
+import LeftSidebar from "@/components/layout/LeftSideBar";
+import { Outlet } from "react-router-dom";
+import CreatePostModal from "@/components/post/CreatePostModal";
 
 const MainLayout: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const sideBarRef = useRef<HTMLDivElement | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const toggleSidebar = () => setIsOpen((prev) => !prev);
+  // Dynamic width based on sidebar collapsed state
+  // const sidebarWidth = isSidebarCollapsed ? "lg:ml-20" : "lg:ml-56";
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar isOpen={isOpen} sideBarRef={sideBarRef} />
-      <div className="flex flex-col flex-1">
-        <Navbar toggleSidebar={toggleSidebar} />
-        <main className="flex-1 p-6 bg-background">
+    <div className="flex min-h-screen bg-background">
+      <div className="hidden lg:block">
+        <LeftSidebar onCollapse={(v: boolean) => setIsSidebarCollapsed(v)} />
+      </div>
+
+      <div
+        className={`flex flex-col flex-1 transition-all duration-300 `}
+      >
+        <Navbar onMobileMenuToggle={() => setMobileMenuOpen(true)} />
+
+        <CreatePostModal />
+        <LeftSidebar
+          isMobile
+          mobileMenuOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+        />
+
+        <main className="flex-1 w-full mx-auto px-2 md:px-4">
           <Outlet />
         </main>
-        {/* <Footer /> */}
+      </div>
+
+      <div className="hidden xl:block">
+        <RightSideBar />
       </div>
     </div>
   );

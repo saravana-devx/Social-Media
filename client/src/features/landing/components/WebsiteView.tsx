@@ -1,7 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import mobileView from "@/assets/LandingPage/images/app-placeholder2.jpg";
-import laptopView from "@/assets/LandingPage/images/mac-placeholder.jpg";
+import React from "react";
+import { motion } from "framer-motion";
+// import mobileView from "@/assets/LandingPage/images/app-placeholder2.jpg";
+// import laptopView from "@/assets/LandingPage/images/mac-placeholder.jpg";
+import laptopView from "@/assets/LandingPage/Images/laptop-view-new.png";
+import mobileView from "@/assets/LandingPage/Images/mobile-view-new.png";
 
 const WebsiteView: React.FC = () => {
   return (
@@ -23,7 +25,7 @@ const WebsiteView: React.FC = () => {
         }}
         transition={{
           duration: 0.8,
-          ease: 'easeOut',
+          ease: "easeOut",
         }}
         viewport={{ once: true }}
       >
@@ -51,7 +53,7 @@ const WebsiteView: React.FC = () => {
         }}
         transition={{
           duration: 0.8,
-          ease: 'easeOut',
+          ease: "easeOut",
           delay: 0.2,
         }}
         viewport={{ once: true }}

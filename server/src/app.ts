@@ -5,11 +5,16 @@ import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
-import errorMiddleware from "./middlewares/errorHandler.middleware";
 dotenv.config();
-export const app: express.Application = express();
+
+import errorMiddleware from "./middlewares/errorHandler.middleware";
 
 import authRoute from "./routes/auth.route";
+import mediaRoute from "./routes/media.route";
+import profileRoute from "./routes/profile.route";
+import postRoute from "./routes/post.route";
+
+export const app: express.Application = express();
 
 // Rate-Limiting
 const rateLimiter = rateLimit({
@@ -80,12 +85,15 @@ app.use(cors(corsOptions));
 // ===============================================
 // Routes will be here
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/profile", profileRoute);
+app.use("/api/v1/media", mediaRoute);
+app.use("/api/v1/post", postRoute);
 // ===============================================
 
 app.use(errorMiddleware);
 
 //Testing route to check server is running or not
-app.get("/test", function (req: Request, res: Response): void {
+app.get("/health", function (req: Request, res: Response): void {
   res.send("<h1>Server is running</h1>");
 });
 

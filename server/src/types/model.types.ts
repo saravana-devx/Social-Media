@@ -2,19 +2,34 @@ import { Document, Types, ObjectId } from "mongoose";
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
   userName: string;
   email: string;
   password: string;
+  phoneNumber: number;
+  dob: Date;
   verified: boolean;
   accountType: "Admin" | "User";
   verificationToken?: string;
   verificationExpires: Date;
   profileImage: string;
-  about?: string;
-  location?: string;
+  about: string;
+  location: string;
   joiningDate: Date;
+  post: Types.ObjectId[];
   friends: Types.ObjectId[];
   savedPosts: Types.ObjectId[];
+}
+
+export interface IMedia extends Document {
+  url: string;
+  public_id: string;
+  resource_type: string; // image/video/raw
+  format: string;
+  width: number;
+  height: number;
+  duration: number;
 }
 
 export interface IStory extends Document {
@@ -34,8 +49,8 @@ export interface IReply extends Document {
 
 export interface IPost extends Document {
   userId: Types.ObjectId;
-  postSrc?: string;
-  description?: string;
+  media: Types.ObjectId;
+  description: string;
   likes: Types.ObjectId[];
   shares: number;
   createdAt: Date;

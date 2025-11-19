@@ -23,6 +23,9 @@ const FriendRequestSchema = new Schema<IFriendRequest>({
   },
 });
 
+// Prevent duplicates
+FriendRequestSchema.index({ from: 1, to: 1 }, { unique: true });
+
 export const FriendRequest = model<IFriendRequest>(
   "FriendRequest",
   FriendRequestSchema

@@ -7,7 +7,11 @@ const PostSchema = new Schema<IPost>({
     ref: "User",
     required: true,
   },
-  postSrc: String,
+  // postSrc: String,
+  media : {
+    type : Schema.Types.ObjectId,
+    ref : "Media",
+  },
   description: String,
   likes: [
     {

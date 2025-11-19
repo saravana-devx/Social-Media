@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Loader2, Lock } from "lucide-react";
-import { useResetPasswordMutation } from "../hooks/useAuthQuery";
+import { useResetPasswordMutation } from "../hooks/useAuthMutations";
 
 const formSchema = z
   .object({

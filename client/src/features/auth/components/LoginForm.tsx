@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../validation";
 import type { LoginPayload } from "../types";
-import { useLoginMutation } from "../hooks/useAuthQuery";
+import { useLoginMutation } from "../hooks/useAuthMutations";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();

@@ -13,6 +13,7 @@ const HTTP_STATUS = {
 
 const COMMON_MESSAGES = {
   REQUIRED_FIELDS: "All fields are required.",
+  UPDATE_FIELD_REQUIRED: "Please provide at least one field to update.",
   IMAGE_NOT_FOUND: "Image not found.",
   VIDEO_NOT_FOUND: "Video not found.",
   INTERNAL_SERVER_ERROR: "Something went wrong in the server",
@@ -20,7 +21,7 @@ const COMMON_MESSAGES = {
 
 const AUTH_MESSAGES = {
   LOGIN: "User logged in successfully.",
-  INVALID_PASSWORD : "Incorrect Password.",
+  INVALID_PASSWORD: "Incorrect Password.",
   MISSING_TOKEN: "Token is missing.",
   INVALID_OR_EXPIRED_TOKEN: "Invalid or expired token.",
   ERROR_DECODING_TOKEN: "Error decoding JWT token.",
@@ -37,7 +38,9 @@ const AUTH_MESSAGES = {
   PASSWORD_UPDATED: "Password updated successfully.",
   SAME_PASSWORD: "New password cannot be the same as the current password.",
   UNAUTHORIZED: "Unauthorized access.",
+  logout: "User Logged Out.",
 };
+
 const USER_MESSAGES = {
   REGISTER: "User registered successfully.",
   UPDATED: "User details updated successfully.",
@@ -47,45 +50,40 @@ const USER_MESSAGES = {
   EMAIL_ALREADY_IN_USE: "Email is already in use.",
   USERNAME_ALREADY_IN_USE: "Username is already in use.",
   NO_DATA_PROVIDED: "No data provided for updating profile.",
+  PROFILE_IMAGE_UPDATE_FAILED: "Failed to update profile image.",
 };
 
-// const RESPONSE_MESSAGES = {
-//   COMMON: {
-//     REQUIRED_FIELDS: "All fields are required.",
-//     IMAGE_NOT_FOUND: "Image not found.",
-//     VIDEO_NOT_FOUND: "Video not found.",
-//     INTERNAL_SERVER_ERROR: "Something went wrong in the server",
-//   },
-//   USERS: {
-//     REGISTER: "User register successfully.",
-//     LOGIN: "User login in successfully.",
-//     NOT_FOUND: "User not found.",
-//     FOUND: "User found.",
-//     NO_DATA_PROVIDED: "No data provided for updating profile.",
-//     EMAIL_NOT_FOUND: "Email not found",
-//     EMAIL_ALREADY_IN_USE: "Email is already in use.",
-//     USERNAME_ALREADY_IN_USE: "User name is already in use",
-//     INVALID_PASSWORD: "Invalid password",
-//     MISSING_TOKEN: "Token is missing.",
-//     EMAIL_SENT: "Email sent successfully",
-//     EMAIL_VERIFIED: "Email verified successfully",
-//     UNVERIFIED_EMAIL: "Email in not verified",
-//     VERIFICATION_TOKEN_EXPIRED: "Invalid or expired token",
-//     UNAUTHORIZED: "Unauthorized access.",
-//     SAME_PASSWORD:
-//       "Your new password cannot be the same as the current password",
-//     PASSWORD_UPDATED: "User password updated successfully",
-//     UPDATED: "User details updated successfully.",
-//     DELETED: "User account deleted successfully.",
-//     OTP_SENT: "OTP sent successfully.",
-//     OTP_RESENT: "OTP re-sent successfully",
-//     OTP_VERIFIED: "OTP verified successfully",
-//     WRONG_OTP: "OTP is incorrect",
-//     ALREADY_VERIFIED: "User account is already verified through OTP.",
-//     REQUEST_NEW_OTP: "Otp as expired request a new one",
-//     INVALID_OR_EXPIRED_TOKEN: "Invalid or the token has been expired.",
-//     ERROR_DECODING_TOKEN: "Error while decoding jwt token.",
-//   },
-// };
+const FRIEND_MESSAGES = {
+  REQUEST_SENT: "Friend request sent successfully.",
+  REQUEST_ACCEPTED: "Friend request accepted successfully.",
+  REQUEST_REJECTED: "Friend request rejected successfully.",
+  REQUEST_CANCELED: "Friend request canceled successfully.",
+  NOT_FOUND: "Friend request not found.",
+  ALREADY_SENT: "Friend request already sent.",
+  ALREADY_FRIENDS: "You are already friends.",
+  NOT_FRIENDS: "You are not friends.",
+  CANNOT_SELF_REQUEST: "You cannot send a request to yourself.",
+  CANNOT_SELF_ACCEPT: "You cannot accept your own request.",
+  FRIEND_REMOVED: "Friend removed successfully.",
+};
 
-export { HTTP_STATUS, COMMON_MESSAGES, AUTH_MESSAGES, USER_MESSAGES };
+const POST_MESSAGES = {
+  CREATED: "Post created successfully.",
+  FETCHED: "user posts.",
+};
+
+const MEDIA_MESSAGES = {
+  SAVED: "Media uploaded and stored successfully.",
+  UPLOADSIGNATURE: "Upload signature generated successfully",
+  NOT_FOUND: "Image/video not found",
+};
+
+export {
+  HTTP_STATUS,
+  COMMON_MESSAGES,
+  AUTH_MESSAGES,
+  USER_MESSAGES,
+  FRIEND_MESSAGES,
+  POST_MESSAGES,
+  MEDIA_MESSAGES,
+};

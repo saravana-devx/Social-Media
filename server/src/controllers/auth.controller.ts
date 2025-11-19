@@ -17,11 +17,15 @@ import {
   handleSendOtp,
   handleVerifyOtp,
   handleResendOtp,
+  handleGetCurentUser,
+  handleLogout,
+  verifyAndRotateRefreshToken,
 } from "../services/auth.service";
 import {
-  longLivedCookieOptions,
-  shortLivedCookieOptions,
-} from "../utils/helper/generateJwtToken";
+  verificationCookieOptions,
+  accessTokenCookieOptions,
+  refreshTokenCookieOptions,
+} from "../utils/helper/generateVerifyJwtToken";
 
 export const registerUser = [
   body("userName")
@@ -58,7 +62,7 @@ export const registerUser = [
     await handleSendOtp(user._id, email, userName);
 
     res
-      .cookie("verification_token", token, shortLivedCookieOptions)
+      .cookie("verification_token", token, verificationCookieOptions)
       .status(HTTP_STATUS.CREATED)
       .json(
         new ApiResponse({
@@ -82,16 +86,11 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  const authToken = await handleVerifyOtp(id, otp);
+  const { accessToken, refreshToken } = await handleVerifyOtp(id, otp);
 
   res
-    .cookie("verification_token", "", {
-      httpOnly: true,
-      expires: new Date(0), // delete old token
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    })
-    .cookie("auth_token", authToken, longLivedCookieOptions)
+    .cookie("linkora_access_token", accessToken, accessTokenCookieOptions)
+    .cookie("linkora_refresh_token", refreshToken, refreshTokenCookieOptions)
     .status(HTTP_STATUS.CREATED)
     .json(
       new ApiResponse({
@@ -135,20 +134,80 @@ export const loginUser = [
         message: COMMON_MESSAGES.REQUIRED_FIELDS,
       });
     }
-    const { token, user } = await handleUserLogin(identifier, password);
+    const { accessToken, refreshToken } = await handleUserLogin(
+      identifier,
+      password
+    );
 
     res
-      .cookie("auth_token", token, longLivedCookieOptions)
+      .cookie("linkora_access_token", accessToken, accessTokenCookieOptions)
+      .cookie("linkora_refresh_token", refreshToken, refreshTokenCookieOptions)
       .status(HTTP_STATUS.OK)
       .json(
         new ApiResponse({
           status: HTTP_STATUS.OK,
           message: AUTH_MESSAGES.LOGIN,
-          data: { token, user },
         })
       );
   }),
 ];
+
+export const refreshToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const oldToken = req.cookies.linkora_refresh_token;
+    if (!oldToken) {
+      throw new ApiError({
+        status: HTTP_STATUS.UNAUTHORIZED,
+        message: "Refresh token missing",
+      });
+    }
+    console.log("Refreshing refresh token");
+    const { newAccessToken, newRefreshToken } =
+      await verifyAndRotateRefreshToken(oldToken);
+
+    return res
+      .cookie("linkora_access_token", newAccessToken, accessTokenCookieOptions)
+      .cookie(
+        "linkora_refresh_token",
+        newRefreshToken,
+        refreshTokenCookieOptions
+      )
+      .status(HTTP_STATUS.OK)
+      .json(
+        new ApiResponse({
+          status: HTTP_STATUS.OK,
+          message: "Token refreshed",
+        })
+      );
+  }
+);
+
+export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.currentUser;
+
+  await handleLogout(id);
+
+  res.clearCookie("linkora_access_token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+  });
+
+  res.clearCookie("linkora_refresh_token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+  });
+
+  res.status(HTTP_STATUS.OK).json(
+    new ApiResponse({
+      status: HTTP_STATUS.OK,
+      message: AUTH_MESSAGES.logout,
+    })
+  );
+});
 
 export const sendPasswordResetEmail = [
   body("email").isEmail().withMessage("Invalid email format"),
@@ -184,6 +243,22 @@ export const resetPassword = asyncHandler(
       new ApiResponse({
         status: HTTP_STATUS.OK,
         message: AUTH_MESSAGES.PASSWORD_UPDATED,
+      })
+    );
+  }
+);
+
+export const getCurentUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.currentUser;
+
+    const user = await handleGetCurentUser(id);
+
+    res.status(HTTP_STATUS.OK).json(
+      new ApiResponse({
+        status: HTTP_STATUS.OK,
+        message: USER_MESSAGES.FOUND,
+        data: user,
       })
     );
   }

@@ -8,7 +8,7 @@ import { JWTTokenPayload } from "../types/auth.types";
 
 dotenv.config();
 
-const secret = process.env.JWT_SECRET as string;
+const secret = process.env.JWT_ACCESS_SECRET as string;
 const verifyTokenFromCookie = (cookieName: string) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies[cookieName];
@@ -21,6 +21,7 @@ const verifyTokenFromCookie = (cookieName: string) =>
     }
 
     const decode = jwt.verify(token, secret) as JWTTokenPayload;
+
     if (!decode) {
       throw new ApiError({
         status: HTTP_STATUS.CONFLICT,
@@ -32,4 +33,4 @@ const verifyTokenFromCookie = (cookieName: string) =>
   });
 
 export const verifyAuth = verifyTokenFromCookie("verification_token");
-export const authUser = verifyTokenFromCookie("auth_token");
+export const authenticateUser = verifyTokenFromCookie("linkora_access_token");

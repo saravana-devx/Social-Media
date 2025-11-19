@@ -1,5 +1,6 @@
-import { type AxiosResponse } from "axios";
-import api from "../../../api/config/axiosConfig";
+import api from "@/api/config/axiosConfig";
+import { AuthURL } from "@/api/config/apiEndpoints";
+
 import type {
   ForgotPasswordPayload,
   LoginPayload,
@@ -7,55 +8,45 @@ import type {
   ResetPasswordPayload,
   VerifyOtpPayload,
 } from "../types";
-import { AuthURL } from "@/api/config/axiosUtils";
 
 export const AuthAPI = {
-  register: async function (data: RegisterPayload) {
-    console.info(data);
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.registerUser,
-      method: "POST",
-      data,
-    });
-    return response.data;
+  register: async (data: RegisterPayload) => {
+    const res = await api.post(AuthURL.registerUser, data);
+    return res.data;
   },
-  login: async function (data: LoginPayload) {
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.loginUser,
-      method: "POST",
-      data,
-    });
-    return response.data;
+
+  login: async (data: LoginPayload) => {
+    const res = await api.post(AuthURL.loginUser, data);
+    return res.data;
   },
-  sendPasswordLink: async function (email: ForgotPasswordPayload) {
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.sendPasswordLink,
-      method: "POST",
-      data: email,
-    });
-    return response.data;
+
+  sendPasswordLink: async (payload: ForgotPasswordPayload) => {
+    const res = await api.post(AuthURL.sendPasswordLink, payload);
+    return res.data;
   },
-  resetForgetPassword: async function (data: ResetPasswordPayload) {
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.resetPassword,
-      method: "PATCH",
-      data,
-    });
-    return response.data;
+
+  resetForgetPassword: async (data: ResetPasswordPayload) => {
+    const res = await api.patch(AuthURL.resetPassword, data);
+    return res.data;
   },
-  verifyOtp: async function (otp: VerifyOtpPayload) {
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.verifyOtp,
-      method: "POST",
-      data: otp,
-    });
-    return response.data;
+
+  verifyOtp: async (data: VerifyOtpPayload) => {
+    const res = await api.post(AuthURL.verifyOtp, data);
+    return res.data;
   },
-  resendOtp: async function () {
-    const response: AxiosResponse = await api.request({
-      url: AuthURL.resendOtp,
-      method: "GET",
-    });
-    return response.data;
+
+  resendOtp: async () => {
+    const res = await api.get(AuthURL.resendOtp);
+    return res.data;
+  },
+
+  getCurrentUser: async () => {
+    const res = await api.get(AuthURL.currentUser);
+    return res.data;
+  },
+
+  logout: async () => {
+    const res = await api.post(AuthURL.logout);
+    return res.data;
   },
 };

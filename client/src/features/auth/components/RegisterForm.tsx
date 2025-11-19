@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, UserPlus } from "lucide-react";
 
 import { registerSchema, type RegisterPayload } from "@/features/auth";
-import { useRegisterMutation } from "../hooks/useAuthQuery";
+import { useRegisterMutation } from "../hooks/useAuthMutations";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();

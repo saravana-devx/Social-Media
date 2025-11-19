@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import post from "@/assets/LandingPage/videos/istockphoto-1435126980-640_adpp_is.mp4";
 import live from "@/assets/LandingPage/videos/26774-361091997_tiny.mp4";
+import { Pause, Play } from "lucide-react";
 
 
 const defaultStory = [
@@ -68,12 +69,12 @@ export default function ScrollStorytelling({ story = defaultStory }) {
         <div className="mt-8 w-full max-w-6xl mx-auto relative px-4 md:px-8 hidden sm:block select-none">
             <img
                 src="https://stackbros.in/social/assets/images/elements/07.svg"
-                className="hidden md:block -left-[32rem] top-0 absolute w-[32rem] h-[32rem] blur-[254px]"
+                className="hidden md:block -left-[32rem] top-0 absolute w-[32rem] h-[32rem] blur-[254px] select-none pointer-events-none"
                 alt=""
             />
             <img
                 src="https://stackbros.in/social/assets/images/elements/07.svg"
-                className="hidden md:block -left-[32rem] bottom-0 absolute w-[32rem] h-[32rem] blur-[254px]"
+                className="hidden md:block -left-[32rem] bottom-0 absolute w-[32rem] h-[32rem] blur-[254px] select-none pointer-events-none"
                 alt=""
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -112,7 +113,7 @@ export default function ScrollStorytelling({ story = defaultStory }) {
                                     <div className="relative w-full">
                                         <img
                                             src="https://stackbros.in/social/assets/images/elements/06.svg"
-                                            className="hidden md:block -z-10 -right-[18rem] top-0 absolute w-[32rem] h-[32rem] blur-[154px]"
+                                            className="hidden md:block -z-10 -right-[18rem] top-0 absolute w-[32rem] h-[32rem] blur-[154px] select-none pointer-events-none"
                                             alt=""
                                         />
                                         <motion.video
@@ -132,9 +133,13 @@ export default function ScrollStorytelling({ story = defaultStory }) {
                                         />
                                         <button
                                             onClick={() => toggleVideo(activeIndex)}
-                                            className="absolute inset-0 m-auto w-16 h-16 bg-green-500 rounded-full text-white flex justify-center items-center opacity-0 hover:opacity-100"
+                                            className="absolute inset-0 m-auto w-full h-full bg-white-500 rounded-full text-white flex justify-center items-center opacity-0 hover:opacity-100"
                                         >
-                                            {pausedStates[activeIndex] ? "▶" : "❚❚"}
+                                            {pausedStates[activeIndex] ? (
+                                                <Play className="w-6 h-6 text-blue-500" />
+                                                ) : (
+                                                <Pause className="w-6 h-6 text-blue-500" />
+                                            )}
                                         </button>
                                     </div>
                                 )}

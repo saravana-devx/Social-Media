@@ -22,7 +22,7 @@ import { verifyOtpSchema } from "../validation";
 import {
   useResendOtpMutation,
   useVerifyOtpMutation,
-} from "../hooks/useAuthQuery";
+} from "../hooks/useAuthMutations";
 
 const VerifyOtp: React.FC = () => {
   const { mutate: verifyOtp, isPending: isVerifying } = useVerifyOtpMutation();

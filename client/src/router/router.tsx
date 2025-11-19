@@ -7,14 +7,18 @@ import MainLayout from "@/layout/MainLayout";
 import ForgotPassword from "@/features/auth/components/ForgetPassword";
 import ResetPassword from "@/features/auth/components/ResetPassword";
 import VerifyOtp from "@/features/auth/components/VerifyOtpForm";
-import ProtectedRoute from "./ProtectedRoute";
+// import ProtectedRoute from "./ProtectedRoute";
 import LandingLayout from "@/layout/LandingLayout";
+import ChatUI from "./Chatui";
+import SettingsPage from "@/features/settings/pages/SettingPage";
+import { ProfilePage } from "@/features/profile";
+
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingLayout />,
-    children : [{index : true, element: <LandingPage/>}]
+    children: [{ index: true, element: <LandingPage /> }],
   },
   {
     path: "/auth",
@@ -27,13 +31,17 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/feed",
     element: (
-      <ProtectedRoute>
-        <MainLayout />
-      </ProtectedRoute>
+      // <ProtectedRoute>
+      <MainLayout />
+      // </ProtectedRoute>
     ),
-    children: [{ index: true, element: <HomePage /> }],
+    children: [
+      { path: "/feed", index: true, element: <HomePage /> },
+      { path: "/profile", element: <ProfilePage /> },
+      { path: "/settings", element: <SettingsPage /> },
+      { path: "/chat", element: <ChatUI /> },
+    ],
   },
   {
     path: "*",
