@@ -1,8 +1,6 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -11,11 +9,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Loader2, Lock } from "lucide-react";
-import { useResetPasswordMutation } from "../hooks/useAuthMutations";
+
+import { useResetPassword } from "../hooks/useAuth";
 
 const formSchema = z
   .object({
@@ -37,7 +37,7 @@ const ResetPassword: React.FC = () => {
     defaultValues: { newPassword: "", confirmPassword: "" },
   });
 
-  const { mutate: registerUser, isPending } = useResetPasswordMutation();
+  const { mutate: registerUser, isPending } = useResetPassword();
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-background via-background to-muted px-4">

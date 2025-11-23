@@ -1,7 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-// import mobileView from "@/assets/LandingPage/images/app-placeholder2.jpg";
-// import laptopView from "@/assets/LandingPage/images/mac-placeholder.jpg";
 import laptopView from "@/assets/LandingPage/Images/laptop-view-new.png";
 import mobileView from "@/assets/LandingPage/Images/mobile-view-new.png";
 

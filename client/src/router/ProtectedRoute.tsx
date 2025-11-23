@@ -1,4 +1,4 @@
-import { useCurrentUserQuery } from "@/features/profile/hooks/useUserProfile";
+import { useCurrentUserQuery } from "@/hooks";
 import React from "react";
 
 interface ProtectedRouteProps {

@@ -1,6 +1,4 @@
-import api from "@/api/config/axiosConfig";
-import { AuthURL } from "@/api/config/apiEndpoints";
-
+import { api, AuthURL } from "@/api/config";
 import type {
   ForgotPasswordPayload,
   LoginPayload,
@@ -11,17 +9,16 @@ import type {
 
 export const AuthAPI = {
   register: async (data: RegisterPayload) => {
-    const res = await api.post(AuthURL.registerUser, data);
+    const res = await api.post(AuthURL.register, data);
     return res.data;
   },
 
   login: async (data: LoginPayload) => {
-    const res = await api.post(AuthURL.loginUser, data);
+    const res = await api.post(AuthURL.login, data);
     return res.data;
   },
-
-  sendPasswordLink: async (payload: ForgotPasswordPayload) => {
-    const res = await api.post(AuthURL.sendPasswordLink, payload);
+  sendPasswordRestLink: async (payload: ForgotPasswordPayload) => {
+    const res = await api.post(AuthURL.sendResetLink, payload);
     return res.data;
   },
 
@@ -40,13 +37,13 @@ export const AuthAPI = {
     return res.data;
   },
 
-  getCurrentUser: async () => {
-    const res = await api.get(AuthURL.currentUser);
-    return res.data;
-  },
+  // getCurrentUser: async () => {
+  //   const res = await api.get(AuthURL.me);
+  //   return res.data;
+  // },
 
-  logout: async () => {
-    const res = await api.post(AuthURL.logout);
-    return res.data;
-  },
+  // logout: async () => {
+  //   const res = await api.post(AuthURL.logout);
+  //   return res.data;
+  // },
 };

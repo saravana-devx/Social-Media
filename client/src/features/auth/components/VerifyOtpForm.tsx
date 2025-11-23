@@ -1,7 +1,7 @@
-import React from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { verifyOtpSchema } from "../validation";
+import type { VerifyOtpPayload } from "../types";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -10,23 +10,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Button } from "@/components/ui/button";
+
 import { Loader2, ShieldCheck } from "lucide-react";
-import type { VerifyOtpPayload } from "../types";
-import { verifyOtpSchema } from "../validation";
-import {
-  useResendOtpMutation,
-  useVerifyOtpMutation,
-} from "../hooks/useAuthMutations";
+
+import { useVerifyOtp, useResendOtp } from "../hooks/useAuth";
 
 const VerifyOtp: React.FC = () => {
-  const { mutate: verifyOtp, isPending: isVerifying } = useVerifyOtpMutation();
-  const { mutate: resendOtp, isPending: isResending } = useResendOtpMutation();
+  const { mutate: verifyOtp, isPending: isVerifying } = useVerifyOtp();
+  const { mutate: resendOtp, isPending: isResending } = useResendOtp();
 
   const form = useForm<VerifyOtpPayload>({
     resolver: zodResolver(verifyOtpSchema),

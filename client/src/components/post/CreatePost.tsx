@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Image as ImageIcon, Video, Calendar, Smile } from "lucide-react";
-import image from "@/assets/Dummy/Images/e1532520016e4f8d4b5f0fa770008724.jpeg";
+import { useCurrentUserQuery } from "@/hooks/api/useUser";
 import { openPostModal } from "@/store/slices/postModal.slice";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Calendar, ImageIcon, Smile, Video } from "lucide-react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useCurrentUserQuery } from "@/features/profile/hooks/useUserProfile";
-import { AvatarFallback } from "@radix-ui/react-avatar";
+
 const ActionButton = ({
   icon,
   label,
@@ -35,18 +34,18 @@ const ActionButton = ({
 const CreatePost: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const dispatch = useDispatch();
-  const { data, isLoading } = useCurrentUserQuery();
+  const { data } = useCurrentUserQuery();
 
   const user = data?.data; // because backend returns { status, data: {...}, message }
-  console.log(user)
+  console.log(user);
   return (
     <div className="w-full max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto mt-4 px-3 sm:px-0">
       <div className="bg-card p-4 sm:p-6 border border-border rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-sm">
         <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-primary/20 shrink-0">
+          <Avatar className="h-10 w-10  ring-4 ring-primary/20">
             <AvatarImage className="object-cover" src={user?.profileImage} />
             <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl font-bold">
-              {/* {user.fullName?.charAt(0).toUpperCase()} */}
+              {user.fullName?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 

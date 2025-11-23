@@ -13,18 +13,18 @@ import {
   REHYDRATE,
 } from "redux-persist";
 
-// ✅ Persist Config
+// Persist Config
 const persistConfig = {
   key: "root",
   storage,
-//   whitelist: ["postModal"], // reducers you want to persist
+  //   whitelist: ["postModal"], // reducers you want to persist
   // blacklist: [] // or blacklist reducers you DON'T want to persist
 };
 
-// ✅ Wrap rootReducer with persistReducer
+// Wrap rootReducer with persistReducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// ✅ Create Store
+// Create Store
 export const store = configureStore({
   reducer: persistedReducer,
 
@@ -36,9 +36,9 @@ export const store = configureStore({
     }),
 });
 
-// ✅ Persistor
+//  Persistor
 export const persistor = persistStore(store);
 
-// ✅ Types (optional but recommended)
+//  Types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

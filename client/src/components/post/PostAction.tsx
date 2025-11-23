@@ -25,7 +25,7 @@ const ActionButton = ({
   </div>
 );
 
-export const PostActions = ({ likes, comments, shares }: PostActionsProps) => {
+const PostActions = ({ likes, comments, shares }: PostActionsProps) => {
   return (
     <div
       className="
@@ -106,3 +106,5 @@ export const PostActions = ({ likes, comments, shares }: PostActionsProps) => {
     </div>
   );
 };
+
+export default PostActions;

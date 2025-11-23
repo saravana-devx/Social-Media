@@ -6,3 +6,8 @@ export type createPost = {
   // mediaId: Types.ObjectId;
   description: string;
 };
+
+export type GetPostsByUserResult = {
+  posts: any[];
+  nextCursor: string | null;
+};

@@ -15,16 +15,15 @@ export const getUploadSignature = asyncHandler(
     );
 
     return res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: MEDIA_MESSAGES.UPLOADSIGNATURE,
-        data: {
+      ApiResponse.success(
+        {
           timestamp,
           signature,
           apiKey: process.env.CLOUDINARY_API_KEY!,
           cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
         },
-      })
+        MEDIA_MESSAGES.SIGNATURE_GENERATED
+      )
     );
   }
 );
@@ -32,11 +31,7 @@ export const getUploadSignature = asyncHandler(
 export const saveMedia = asyncHandler(async (req: Request, res: Response) => {
   const media = await Media.create(req.body);
 
-  return res.status(HTTP_STATUS.OK).json(
-    new ApiResponse({
-      status: HTTP_STATUS.OK,
-      message: MEDIA_MESSAGES.SAVED,
-      data: media,
-    })
-  );
+  return res
+    .status(HTTP_STATUS.CREATED)
+    .json(ApiResponse.created(media, MEDIA_MESSAGES.SAVED));
 });

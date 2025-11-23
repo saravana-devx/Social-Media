@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const SavedMedia = () => {
   return (
@@ -7,7 +7,7 @@ const SavedMedia = () => {
       <Card className="border-border shadow-lg">
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-lg font-bold text-foreground">Photos</h2>
+            <h2 className="text-lg font-bold text-foreground">Saved Posts</h2>
             <Button
               variant="ghost"
               className="text-primary hover:text-primary/80"

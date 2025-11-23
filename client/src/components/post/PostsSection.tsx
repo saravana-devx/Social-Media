@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { PostModal } from "./PostModal";
+import { Button } from "../ui/button";
+import PostModal from "./PostModal";
+
 
 export interface PostMedia {
   url?: string;
@@ -26,10 +28,11 @@ interface PostsSectionProps {
   posts: PostType[];
 }
 
+
 const FALLBACK_IMAGE =
   "https://res.cloudinary.com/dl5w7xxf8/image/upload/v1763289836/gecdubyl2glw15dbgsei.jpg";
 
-export const PostsSection = ({ posts }: PostsSectionProps) => {
+const PostsSection = ({ posts }: PostsSectionProps) => {
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
   // Generate video thumbnail using public_id
@@ -43,9 +46,42 @@ export const PostsSection = ({ posts }: PostsSectionProps) => {
     return media.url; // image case
   };
 
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center border rounded-lg bg-card shadow-sm">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-12 w-12 text-muted-foreground mb-3"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 9l9-6 9 6M4 10v10h16V10M10 14h4"
+          />
+        </svg>
+
+        <h3 className="text-lg font-semibold text-foreground">No Posts Yet</h3>
+        <p className="text-muted-foreground text-sm mt-1">
+          Looks like there are no posts to show right now.
+        </p>
+        <Button
+          variant="default"
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Refresh
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4">
-      {/* Grid thumbnails */}
+
       <div className="grid grid-cols-3 gap-2">
         {posts.map((post) => {
           const thumbnail = getThumbnail(post.media);
@@ -96,12 +132,13 @@ export const PostsSection = ({ posts }: PostsSectionProps) => {
         })}
       </div>
 
-      {/* Modal */}
       <PostModal
-        open={!!selectedPost}
+        // open={!!selectedPost}
         post={selectedPost}
-        onClose={() => setSelectedPost(null)}
+        // onClose={() => setSelectedPost(null)}
       />
     </div>
   );
 };
+
+export default PostsSection;

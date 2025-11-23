@@ -1,43 +1,27 @@
 import { Schema, model, Types } from "mongoose";
-import cron from "node-cron";
+import { IRefreshToken } from "../types/model.types";
 
-const RefreshTokenSchema = new Schema(
+const refreshTokenSchema = new Schema<IRefreshToken>(
   {
-    userId: {
-      type: Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
-    },
-    token: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    revoked: {
-      type: Boolean,
-      default: false,
-    },
-    expiresAt: {
-      type: Date,
-      required: true,
-    },
-    replacedByToken: {
-      type: String,
-      default: null,
-    },
+    userId: { type: Schema.Types.ObjectId, ref: "User", index: true },
+    token: { type: String, required: true, unique: true },
+    sessionId: { type: String, required: true, index: true },
+
+    deviceName: String,
+    ipAddress: String,
+    browserInfo: String,
+    osInfo: String,
+    userAgent: String,
+
+    revoked: { type: Boolean, default: false, index: true },
+    expiresAt: { type: Date, required: true, index: true },
+
+    replacedByToken: { type: Schema.Types.ObjectId, ref: "RefreshToken" },
   },
   { timestamps: true }
 );
 
-//auto-delete expired tokens
-RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
-cron.schedule("0 0 * * *", async () => {
-  await RefreshTokenModel.deleteMany({
-    expiresAt: { $lt: new Date() },
-  });
-  console.log("🧹 Cleaned up expired refresh tokens");
-});
-
-export const RefreshTokenModel = model("RefreshToken", RefreshTokenSchema);
+export const RefreshTokenModel = model<IRefreshToken>(
+  "RefreshToken",
+  refreshTokenSchema
+);

@@ -1,6 +1,9 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { RegisterPayload } from "../types";
+import { registerSchema } from "../validation";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -9,8 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,15 +19,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
 import { Loader2, UserPlus } from "lucide-react";
 
-import { registerSchema, type RegisterPayload } from "@/features/auth";
-import { useRegisterMutation } from "../hooks/useAuthMutations";
+import { useRegister } from "../hooks/useAuth";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { mutate: registerUser, isPending } = useRegisterMutation();
+  const { mutate: registerUser, isPending } = useRegister();
 
   const form = useForm<RegisterPayload>({
     resolver: zodResolver(registerSchema),

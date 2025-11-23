@@ -1,34 +1,45 @@
-import { createTransport } from "nodemailer";
+import { createTransport, Transporter } from "nodemailer";
 import dotenv from "dotenv";
+import { ApiError } from "../apiResponseHandler/apiError";
+import { HTTP_STATUS } from "../constants";
+
 dotenv.config();
 
-// <Promise>:any --> is used when we don't know the type of value return by the function
 const mailSender = async (
   email: string,
-  title: string,
-  body: string
+  subject: string,
+  html: string
 ): Promise<any> => {
   try {
-    let transporter = createTransport({
+    const transporter: Transporter = createTransport({
       host: process.env.MAIL_HOST,
-      port: 587, // Port for STARTTLS
-      secure: false,
+      port: Number(process.env.MAIL_PORT) || 587,
+      secure: false, // TLS will upgrade
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
+      tls: { rejectUnauthorized: false }, // Important for production SMTP providers
     });
+
+    // verify connection before sending
+    await transporter.verify();
+
     const mailOptions = {
-      from: "venom86224@gmail.com - social media platform",
+      from: `"Social Media Platform" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: title,
-      html: body,
+      subject,
+      html,
     };
-    let info = await transporter.sendMail(mailOptions);
-    return info;
-  } catch (error) {
-    // console.log("Error in mailSender : ", error);
-    throw Error("Something went wrong while sending email.");
+
+    return await transporter.sendMail(mailOptions);
+  } catch (error: any) {
+    console.error("Email Sending Error:", error);
+
+    throw new ApiError(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "Failed to send email. Please try again later."
+    );
   }
 };
 

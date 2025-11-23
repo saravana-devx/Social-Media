@@ -1,9 +1,18 @@
 import { z } from "zod";
 
+const metaSchema = z.object({
+  ipAddress: z.string().optional(),
+  browserName: z.string().optional(),
+  osName: z.string().optional(),
+  userAgent: z.string().optional(),
+  deviceName: z.string().optional(),
+});
+
 // Login form schema
 export const loginSchema = z.object({
-  identifier: z.string().min(3, "Enter your username or email"),
+  usernameOrEmail: z.string().min(3, "Enter your username or email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  meta: metaSchema.optional(),
 });
 
 // Register form schema

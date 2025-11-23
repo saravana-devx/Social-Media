@@ -1,28 +1,28 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, CheckCircle, Briefcase, Camera } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import ProfileTabs from "../components/ProfileTabs";
-import {
-  useChangeProfileImage,
-  useCurrentUserQuery,
-} from "../hooks/useUserProfile";
 import { useRef, useState } from "react";
-import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
-const ProfileHeader = () => {
+import { Calendar, Camera, CheckCircle, MapPin } from "lucide-react";
+
+import ProfileTabs from "./ProfileTabs";
+
+import { useUpdateProfileImageMutation } from "../hooks/useProfile";
+import { useCloudinaryUpload } from "@/hooks";
+
+interface ProfileHeaderProps {
+  user: any;
+  isOwnProfile: boolean;
+}
+
+const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const { data, isLoading } = useCurrentUserQuery();
-  const user = data?.data;
-
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { mutateAsync: uploadToCloudinary } = useCloudinaryUpload();
-  const { mutateAsync: updateDP } = useChangeProfileImage();
-
-  if (isLoading) return <p>Loading...</p>;
+  const { mutateAsync: updateDP } = useUpdateProfileImageMutation();
 
   const fullName =
     user?.firstName && user?.lastName
@@ -49,13 +49,14 @@ const ProfileHeader = () => {
   const bgStyle = getProfileBackground(user?.userName || "default");
 
   const handleDPChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isOwnProfile) return; // ⛔ Block if not own profile
+
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       setIsUploading(true);
       const { uploaded } = await uploadToCloudinary({ file, saveToDB: false });
-      const imageUrl: string = uploaded.secure_url;
-      await updateDP(imageUrl);
+      await updateDP(uploaded.secure_url);
     } catch (err) {
       console.error("DP update failed:", err);
     } finally {
@@ -68,14 +69,14 @@ const ProfileHeader = () => {
       <div
         className={`h-48 w-full bg-gradient-to-r from-primary via-accent to-primary ${bgStyle}`}
       />
-
       <CardContent className="relative p-6 pb-4">
-        {/* Avatar */}
         <div className="absolute -top-14 left-6">
           <div className="relative group">
             <Avatar
-              className="h-28 w-28 ring-4 ring-card overflow-hidden cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
+              className={`h-28 w-28 ring-4 ring-card overflow-hidden ${
+                isOwnProfile ? "cursor-pointer" : ""
+              }`}
+              onClick={() => isOwnProfile && fileInputRef.current?.click()}
             >
               {!isUploading ? (
                 <AvatarImage
@@ -87,42 +88,34 @@ const ProfileHeader = () => {
                   <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent" />
                 </div>
               )}
-
               <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl font-bold">
                 {fullName?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            {/* Bottom-right camera button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="
-                absolute bottom-1 right-1
-                bg-primary text-primary-foreground
-                h-8 w-8 flex items-center justify-center
-                rounded-full shadow-md border border-white
-                hover:bg-primary/90 transition
-              "
-            >
-              <Camera className="h-4 w-4" />
-            </button>
+            {isOwnProfile && (
+              <>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute bottom-1 right-1 bg-primary text-primary-foreground h-8 w-8 flex items-center justify-center rounded-full shadow-md border border-white hover:bg-primary/90 transition"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
 
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleDPChange}
-            />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleDPChange}
+                />
+              </>
+            )}
           </div>
         </div>
 
-        {/* User Info */}
-        {/* User Info Section */}
         <div className="mt-16">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            {/* LEFT: Name + about + details */}
             <div className="flex-1 min-w-[250px]">
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 {fullName}
@@ -130,17 +123,15 @@ const ProfileHeader = () => {
               </h1>
 
               <p className="text-muted-foreground">
-                {user?.friends?.length || 0} friends
+                {user?.friendsCount || 0} friends
               </p>
 
-              {/* About text — full width */}
               {user?.about && (
                 <p className="text-muted-foreground text-sm mt-3 leading-relaxed max-w-3xl">
                   {user.about}
                 </p>
               )}
 
-              {/* Location, joined date */}
               <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
                 {user?.location && (
                   <span className="flex items-center gap-1">
@@ -157,20 +148,20 @@ const ProfileHeader = () => {
               </div>
             </div>
 
-            {/* RIGHT: Edit Button */}
-            <div className="shrink-0">
-              <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                onClick={() => navigate("/settings")}
-              >
-                Edit profile
-              </Button>
-            </div>
+            {isOwnProfile && (
+              <div className="shrink-0">
+                <Button
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                  onClick={() => navigate("/settings")}
+                >
+                  Edit profile
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Tabs */}
           <div className="mt-6">
-            <ProfileTabs />
+            <ProfileTabs userId={user._id} isOwnProfile={isOwnProfile} />
           </div>
         </div>
       </CardContent>

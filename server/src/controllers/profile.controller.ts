@@ -12,177 +12,118 @@ import {
   handleGetUserDetail,
   handleCancelFriendRequest,
   handleRejectFriendRequest,
+  handleSearchProfile,
 } from "../services/profile.service";
 
 import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
-import {
-  FRIEND_MESSAGES,
-  HTTP_STATUS,
-  USER_MESSAGES,
-} from "../utils/constants";
+import { COMMON_MESSAGES, HTTP_STATUS, USER_MESSAGES } from "../utils/constants";
+import { ApiError } from "../utils/apiResponseHandler/apiError";
 
-export const updateProfile = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.currentUser.id;
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+  // const userId = req.currentUser.id;
+  const updatedUser = await handleUpdateProfile(req.body);
 
-    const { firstName, lastName, phoneNumber, dob, location, about } = req.body;
-
-    const user = await handleUpdateProfile({
-      id,
-      firstName,
-      lastName,
-      phoneNumber,
-      dob,
-      location,
-      about,
-    });
-
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: USER_MESSAGES.UPDATED,
-        data: user,
-      })
-    );
-  }
-);
+  res.status(HTTP_STATUS.OK).json(
+    ApiResponse.success(updatedUser, USER_MESSAGES.UPDATE_SUCCESS)
+  );
+});
 
 export const getFriends = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.currentUser.id;
-
-  const friends = await handleGetFriends(id);
+  const { userId } = req.params;
+  const friends = await handleGetFriends(userId);
 
   res.status(HTTP_STATUS.OK).json(
-    new ApiResponse({
-      status: HTTP_STATUS.OK,
-      message: USER_MESSAGES.FOUND,
-      data: friends,
-    })
+    ApiResponse.success(friends, USER_MESSAGES.FOUND)
   );
 });
 
-export const sendFriendRequest = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.currentUser.id;
-    const { friendId } = req.params;
+export const sendFriendRequest = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { friendId } = req.params;
 
-    const message = await handleSendFriendRequest(id, friendId);
+  const message = await handleSendFriendRequest(userId, friendId);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message,
-      })
-    );
-  }
-);
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+});
 
-export const acceptFriendRequest = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.currentUser.id;
-    const { requesterId } = req.params;
+export const acceptFriendRequest = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { requesterId } = req.params;
 
-    const message = await handleAcceptFriendRequest(id, requesterId);
+  const message = await handleAcceptFriendRequest(userId, requesterId);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message,
-      })
-    );
-  }
-);
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+});
 
-export const cancelFriendRequest = asyncHandler(
-  async (req: Request, res: Response) => {
-    const userId = req.currentUser.id;
-    const { targetUserId } = req.params;
 
-    const message = await handleCancelFriendRequest(userId, targetUserId);
+export const cancelFriendRequest = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { targetUserId } = req.params;
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message,
-      })
-    );
-  }
-);
+  const message = await handleCancelFriendRequest(userId, targetUserId);
 
-export const rejectFriendRequest = asyncHandler(
-  async (req: Request, res: Response) => {
-    const userId = req.currentUser.id;
-    const { requesterId } = req.params;
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+});
 
-    const message = await handleRejectFriendRequest(userId, requesterId);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message,
-      })
-    );
-  }
-);
+export const rejectFriendRequest = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { requesterId } = req.params;
 
-export const removeFriend = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.currentUser.id;
-    const { friendId } = req.params;
+  const message = await handleRejectFriendRequest(userId, requesterId);
 
-    const message = await handleRemoveFriend(id, friendId);
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+});
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message,
-      })
-    );
-  }
-);
+
+export const removeFriend = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { friendId } = req.params;
+
+  const message = await handleRemoveFriend(userId, friendId);
+
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+});
+
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.currentUser.id;
+  const userId = req.currentUser.id;
+  await handleDeleteProfile(userId);
 
-  await handleDeleteProfile(id);
-
-  res.status(HTTP_STATUS.OK).json(
-    new ApiResponse({
-      status: HTTP_STATUS.OK,
-      message: USER_MESSAGES.DELETED,
-    })
-  );
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, USER_MESSAGES.DELETE_SUCCESS));
 });
 
-export const updateProfileImage = asyncHandler(
-  async (req: Request, res: Response) => {
-    const id = req.currentUser.id;
-    const { secureUrl } = req.body;
-    
-    const updated = await handleUpdateProfileImage(id, secureUrl);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: USER_MESSAGES.UPDATED,
-        data: updated,
-      })
-    );
+export const updateProfileImage = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.currentUser.id;
+  const { secureUrl } = req.body;
+
+  if (!secureUrl) {
+    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
   }
-);
 
-export const getUserDetail = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { userId } = req.params;
+  const updatedUser = await handleUpdateProfileImage(userId, secureUrl);
 
-    const user = await handleGetUserDetail(userId);
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(updatedUser, USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED));
+});
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: USER_MESSAGES.FOUND,
-        data: user,
-      })
-    );
+
+export const getUserDetail = asyncHandler(async (req: Request, res: Response) => {
+  const { userName } = req.params;
+  const user = await handleGetUserDetail(userName);
+
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(user, USER_MESSAGES.FOUND));
+});
+
+
+export const getSearchedProfile = asyncHandler(async (req: Request, res: Response) => {
+  const search = req.query.search as string;
+
+  if (!search) {
+    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
   }
-);
+
+  const users = await handleSearchProfile(search);
+
+  res.status(HTTP_STATUS.OK).json(ApiResponse.success(users, USER_MESSAGES.FOUND));
+});

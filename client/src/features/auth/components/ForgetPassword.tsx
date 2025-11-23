@@ -1,7 +1,7 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useNavigate } from "react-router-dom";
+import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -10,12 +10,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { KeyRound, ArrowLeft, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useSendPasswordLinkMutation } from "@/features/auth";
+import { ArrowLeft, KeyRound, Loader2 } from "lucide-react";
+
+import { useRequestPasswordReset } from "../hooks/useAuth";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,7 +26,7 @@ type FormValues = z.infer<typeof formSchema>;
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
 
-  const { mutate: forgotPassword, isPending } = useSendPasswordLinkMutation();
+  const { mutate: forgotPassword, isPending } = useRequestPasswordReset();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

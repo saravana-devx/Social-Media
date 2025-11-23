@@ -22,6 +22,21 @@ export interface IUser extends Document {
   savedPosts: Types.ObjectId[];
 }
 
+export interface IRefreshToken extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  token: string;
+  sessionId: string;
+  deviceName?: string;
+  userAgent?: string;
+  ipAddress?: string;
+  browserInfo? : string;
+  osInfo? : string;
+  revoked: boolean;
+  expiresAt: Date;
+  replacedByToken?: Types.ObjectId | null;
+}
+
 export interface IMedia extends Document {
   url: string;
   public_id: string;

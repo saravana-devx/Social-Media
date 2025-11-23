@@ -1,71 +1,75 @@
-import api from "@/api/config/axiosConfig";
-import { ProfileURL } from "@/api/config/apiEndpoints";
-import type { EditProfilePayload } from "@/features/settings/validation";
 import type { AxiosResponse } from "axios";
+import { api, ProfileURL } from "@/api/config";
+import type { EditProfilePayload } from "@/features/settings/validation";
 
 export const ProfileAPI = {
-  updateProfile: async (payload: EditProfilePayload) => {
-    const res: AxiosResponse = await api.patch(
-      ProfileURL.updateProfile,
-      payload
-    );
-    return res.data;
+  updateProfileDetails: async (payload: EditProfilePayload) => {
+    const { data }: AxiosResponse = await api.patch(ProfileURL.update, payload);
+    return data;
   },
 
-  updateProfileImage: async (payload: string) => {
-    const res: AxiosResponse = await api.patch(ProfileURL.updateProfileImage, {
-      secureUrl: payload,
+  updateProfilePicture: async (imageUrl: string) => {
+    const { data }: AxiosResponse = await api.patch(ProfileURL.updateImage, {
+      secureUrl: imageUrl,
     });
-    return res.data;
+    return data;
   },
 
-  deleteUser: async () => {
-    const res: AxiosResponse = await api.delete(ProfileURL.deleteUser);
-    return res.data;
+  deleteAccount: async () => {
+    const { data }: AxiosResponse = await api.delete(ProfileURL.delete);
+    return data;
   },
 
-  getUserDetail: async (userId: string) => {
-    const res: AxiosResponse = await api.get(ProfileURL.getUserDetail(userId));
-    return res.data;
-  },
-
-  getFriends: async () => {
-    const res: AxiosResponse = await api.get(ProfileURL.getFriends);
-    return res.data;
-  },
-
-  sendFriendRequest: async (friendId: string) => {
-    const res: AxiosResponse = await api.post(
-      ProfileURL.sendFriendRequest(friendId)
+  fetchUserDetails: async (userId: string) => {
+    const { data }: AxiosResponse = await api.get(
+      ProfileURL.userDetail(userId)
     );
-    return res.data;
+    return data;
+  },
+  fetchUserFriends: async (userId: string) => {
+    const { data }: AxiosResponse = await api.get(ProfileURL.friends(userId));
+    return data;
   },
 
-  acceptFriendRequest: async (requesterId: string) => {
-    const res: AxiosResponse = await api.post(
-      ProfileURL.acceptFriendRequest(requesterId)
+  sendFriendRequest: async (receiverId: string) => {
+    const { data }: AxiosResponse = await api.post(
+      ProfileURL.sendRequest(receiverId)
     );
-    return res.data;
+    return data;
   },
 
-  cancelFriendRequest: async (targetUserId: string) => {
-    const res: AxiosResponse = await api.post(
-      ProfileURL.cancelFriendRequest(targetUserId)
+  acceptFriendRequest: async (senderId: string) => {
+    const { data }: AxiosResponse = await api.post(
+      ProfileURL.acceptRequest(senderId)
     );
-    return res.data;
+    return data;
   },
 
-  rejectFriendRequest: async (requesterId: string) => {
-    const res: AxiosResponse = await api.post(
-      ProfileURL.rejectFriendRequest(requesterId)
+  cancelFriendRequest: async (receiverId: string) => {
+    const { data }: AxiosResponse = await api.post(
+      ProfileURL.cancelRequest(receiverId)
     );
-    return res.data;
+    return data;
+  },
+
+  rejectFriendRequest: async (senderId: string) => {
+    const { data }: AxiosResponse = await api.post(
+      ProfileURL.rejectRequest(senderId)
+    );
+    return data;
   },
 
   removeFriend: async (friendId: string) => {
-    const res: AxiosResponse = await api.delete(
+    const { data }: AxiosResponse = await api.delete(
       ProfileURL.removeFriend(friendId)
     );
-    return res.data;
+    return data;
+  },
+
+  searchUsers: async (search: string) => {
+    const { data }: AxiosResponse = await api.get(
+      ProfileURL.searchUsers(search)
+    );
+    return data;
   },
 };

@@ -1,20 +1,21 @@
 import { createBrowserRouter } from "react-router-dom";
-import { LoginPage, RegisterPage } from "@/features/auth";
+import ProtectedRoute from "./ProtectedRoute";
+import { LandingLayout, MainLayout } from "@/components/layout";
+import {
+  ForgotPasswordPage,
+  LoginPage,
+  RegisterPage,
+  ResetPasswordPage,
+  VerifyOtpPage,
+} from "@/features/auth";
 import { LandingPage } from "@/features/landing";
 import { HomePage } from "@/features/home";
-import NotFound from "@/layout/NotFound";
-import MainLayout from "@/layout/MainLayout";
-import ForgotPassword from "@/features/auth/components/ForgetPassword";
-import ResetPassword from "@/features/auth/components/ResetPassword";
-import VerifyOtp from "@/features/auth/components/VerifyOtpForm";
-// import ProtectedRoute from "./ProtectedRoute";
-import LandingLayout from "@/layout/LandingLayout";
-import ChatUI from "./Chatui";
-import SettingsPage from "@/features/settings/pages/SettingPage";
 import { ProfilePage } from "@/features/profile";
+import SettingsPage from "@/features/settings/pages/SettingPage";
+import ChatUI from "@/features/chat/components/Chatui";
+import NotFound from "@/components/feedback/NotFound";
 
-
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingLayout />,
@@ -25,20 +26,22 @@ export const router = createBrowserRouter([
     children: [
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
-      { path: "forgot-password", element: <ForgotPassword /> },
-      { path: "reset-password", element: <ResetPassword /> },
-      { path: "verify-otp", element: <VerifyOtp /> },
+      { path: "forgot-password", element: <ForgotPasswordPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
+      { path: "verify-otp", element: <VerifyOtpPage /> },
     ],
   },
   {
     element: (
-      // <ProtectedRoute>
-      <MainLayout />
-      // </ProtectedRoute>
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
     ),
     children: [
-      { path: "/feed", index: true, element: <HomePage /> },
-      { path: "/profile", element: <ProfilePage /> },
+      { path: "/home", index: true, element: <HomePage /> },
+      // added question mark ( ? ) at the end of the userName
+      // so we can access both self profile and other users profile
+      { path: "/profile/:userName?", element: <ProfilePage /> },
       { path: "/settings", element: <SettingsPage /> },
       { path: "/chat", element: <ChatUI /> },
     ],
@@ -48,3 +51,5 @@ export const router = createBrowserRouter([
     element: <NotFound />,
   },
 ]);
+
+export default router;

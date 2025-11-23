@@ -1,24 +1,32 @@
-import { useState, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { X, ImageIcon, Video, Smile, Send, ChevronDown, ChevronUp } from "lucide-react";
-import { useDropzone } from "react-dropzone";
-import { useSelector, useDispatch } from "react-redux";
-import { closePostModal } from "@/store/slices/postModal.slice";
-import { useCreatePost, useCurrentUserQuery } from "@/features/profile/hooks/useUserProfile";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
-import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
-import { createPostSchema, type CreatePostPayload } from "./CreatePostSchema";
+import { createPostSchema, type CreatePostPayload } from "./validation";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { ChevronDown, ChevronUp, ImageIcon, Video, X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { useCurrentUserQuery } from "@/hooks/api/useUser";
+import { useCreatePostMutation } from "@/hooks/api/usePost";
+import { useCloudinaryUpload } from "@/hooks";
+
+import { useDropzone } from "react-dropzone";
+
+import { closePostModal } from "@/store/slices/postModal.slice";
+
 
 interface PreviewFile extends File {
   preview: string;
@@ -33,7 +41,7 @@ const CreatePostModal = () => {
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const uploadToCloudinary = useCloudinaryUpload();
-  const createPostMutation = useCreatePost();
+  const createPostMutation = useCreatePostMutation();
 
   const form = useForm<CreatePostPayload>({
     resolver: zodResolver(createPostSchema),
@@ -64,13 +72,16 @@ const CreatePostModal = () => {
   };
 
   const handleSubmit = async (values: CreatePostPayload) => {
-    let mediaId : string = "";
+    let mediaId: string = "";
 
     if (files.length > 0) {
       const realFile = files[0];
-      const { media }= await uploadToCloudinary.mutateAsync({ file : realFile, saveToDB: true });
-      mediaId = media?._id ?? ""; 
-      if(!media?._id){
+      const { media } = await uploadToCloudinary.mutateAsync({
+        file: realFile,
+        saveToDB: true,
+      });
+      mediaId = media?._id ?? "";
+      if (!media?._id) {
         toast.error("Image upload failed. Please try again.");
       }
     }
@@ -99,7 +110,8 @@ const CreatePostModal = () => {
     }
   };
 
-  const isPosting = uploadToCloudinary.isPending || createPostMutation.isPending;
+  const isPosting =
+    uploadToCloudinary.isPending || createPostMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -116,7 +128,10 @@ const CreatePostModal = () => {
               <div className="p-4 sm:p-5 space-y-4">
                 <div className="flex items-start gap-3">
                   <Avatar className="h-10 w-10 sm:h-12 sm:w-12 ring-2 ring-primary/20 shrink-0">
-                    <AvatarImage className="object-cover" src={user?.profileImage} />
+                    <AvatarImage
+                      className="object-cover"
+                      src={user?.profileImage}
+                    />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-foreground font-semibold">
                       {user?.firstName?.charAt(0).toUpperCase()}
                     </AvatarFallback>
@@ -141,7 +156,7 @@ const CreatePostModal = () => {
                             {...field}
                             placeholder="What's on your mind?"
                             className={`border-none shadow-none resize-none p-4 text-sm sm:text-base focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground transition-all duration-300 ${
-                              isExpanded ? 'min-h-[300px]' : 'min-h-[120px]'
+                              isExpanded ? "min-h-[300px]" : "min-h-[120px]"
                             }`}
                             disabled={isPosting}
                           />
@@ -150,7 +165,7 @@ const CreatePostModal = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex justify-between items-center px-4 pb-2 bg-muted/10">
                     <span className="text-xs text-muted-foreground">
                       {form.watch("description")?.length || 0} characters
@@ -219,7 +234,7 @@ const CreatePostModal = () => {
                               className="object-cover w-full h-full"
                             />
                           )}
-                          
+
                           <button
                             onClick={() => removeFile(file.name)}
                             disabled={isPosting}
@@ -248,7 +263,10 @@ const CreatePostModal = () => {
 
               <Button
                 type="submit"
-                disabled={isPosting || (!form.watch("description") && files.length === 0)}
+                disabled={
+                  isPosting ||
+                  (!form.watch("description") && files.length === 0)
+                }
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-6 sm:px-8 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 {isPosting ? "Posting..." : "Post"}

@@ -81,20 +81,12 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-//Delete this document after the account is not verified after 24hours using verificationExpires
+//Delete this document after the account is not verified for past 24hours using verificationExpires
 userSchema.index(
   { verificationExpires: 1 },
   { expireAfterSeconds: 0, partialFilterExpression: { verified: false } }
 );
 
-// cron.schedule("0 0 * * *", async () => {
-//   // runs daily
-//   await User.deleteMany({
-//     verified: false,
-//     createdAt: { $lt: new Date(Date.now() - 1000) }, // older than 7 days
-//   });
-//   console.log("Cleaned up unverified users");
-// });
 userSchema.index({ friends: 1 });
 userSchema.index({ savedPosts: 1 });
 userSchema.index({ post: 1 });

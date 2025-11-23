@@ -17,10 +17,11 @@ import {
   handleSendOtp,
   handleVerifyOtp,
   handleResendOtp,
-  handleGetCurentUser,
+  getUserById,
   handleLogout,
   verifyAndRotateRefreshToken,
 } from "../services/auth.service";
+
 import {
   verificationCookieOptions,
   accessTokenCookieOptions,
@@ -28,238 +29,142 @@ import {
 } from "../utils/helper/generateVerifyJwtToken";
 
 export const registerUser = [
-  body("userName")
-    .isLength({ min: 4 })
-    .withMessage("UserName must be at least 4 characters long"),
-  body("email").isEmail().withMessage("Invalid email format"),
-  body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+  body("userName").isLength({ min: 3 }).withMessage("Username is too short"),
+  body("email").isEmail().withMessage("Invalid email"),
+  body("password").isLength({ min: 6 }).withMessage("Password too short"),
   asyncHandler(async (req: Request, res: Response) => {
-    const { userName, email, password } = req.body;
-
-    // Check if all required fields are present
-    if (!userName || !email || !password) {
-      throw new ApiError({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: COMMON_MESSAGES.REQUIRED_FIELDS,
-      });
-    }
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new ApiError({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: errors.array()[0].msg,
-      });
-    }
+    if (!errors.isEmpty()) throw ApiError.BadRequest(errors.array()[0].msg);
+
+    const { userName, email, password } = req.body;
+    if (!userName || !email || !password)
+      throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
 
     const { user, token } = await registerNewUser({
       userName,
       email,
       password,
     });
-
     await handleSendOtp(user._id, email, userName);
 
     res
       .cookie("verification_token", token, verificationCookieOptions)
-      .status(HTTP_STATUS.CREATED)
-      .json(
-        new ApiResponse({
-          status: HTTP_STATUS.CREATED,
-          message: USER_MESSAGES.REGISTER,
-          data: { user },
-        })
-      );
+      .status(201)
+      .json(ApiResponse.created({ user }, USER_MESSAGES.REGISTER_SUCCESS));
   }),
 ];
 
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   const { otp } = req.body;
+  if (!otp) throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
 
   const { id } = req.currentUser;
-
-  if (!otp) {
-    throw new ApiError({
-      status: HTTP_STATUS.BAD_REQUEST,
-      message: COMMON_MESSAGES.REQUIRED_FIELDS,
-    });
-  }
-
   const { accessToken, refreshToken } = await handleVerifyOtp(id, otp);
 
   res
     .cookie("linkora_access_token", accessToken, accessTokenCookieOptions)
     .cookie("linkora_refresh_token", refreshToken, refreshTokenCookieOptions)
-    .status(HTTP_STATUS.CREATED)
-    .json(
-      new ApiResponse({
-        status: HTTP_STATUS.CREATED,
-        message: AUTH_MESSAGES.OTP_VERIFIED,
-      })
-    );
+    .status(200)
+    .json(ApiResponse.success(null, AUTH_MESSAGES.OTP_VERIFIED));
 });
 
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.currentUser;
 
   await handleResendOtp(id);
-
-  res.status(HTTP_STATUS.CREATED).json(
-    new ApiResponse({
-      status: HTTP_STATUS.OK,
-      message: AUTH_MESSAGES.OTP_RESENT,
-    })
-  );
+  res.status(200).json(ApiResponse.success(null, AUTH_MESSAGES.OTP_RESENT));
 });
 
 export const loginUser = [
-  body("identifier").notEmpty().withMessage("Email or username is required"),
-  body("password").notEmpty().withMessage("Password is required"),
-
+  body("usernameOrEmail").notEmpty().withMessage("Email or username required"),
+  body("password").notEmpty().withMessage("Password required"),
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new ApiError({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: errors.array()[0].msg,
-      });
-    }
+    if (!errors.isEmpty()) throw ApiError.BadRequest(errors.array()[0].msg);
 
-    // Identifier can be userName or email
-    const { identifier, password } = req.body;
-    if (!identifier || !password) {
-      throw new ApiError({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: COMMON_MESSAGES.REQUIRED_FIELDS,
-      });
-    }
+    const { usernameOrEmail, password, meta } = req.body;
     const { accessToken, refreshToken } = await handleUserLogin(
-      identifier,
-      password
+      usernameOrEmail,
+      password,
+      meta
     );
 
     res
       .cookie("linkora_access_token", accessToken, accessTokenCookieOptions)
       .cookie("linkora_refresh_token", refreshToken, refreshTokenCookieOptions)
-      .status(HTTP_STATUS.OK)
-      .json(
-        new ApiResponse({
-          status: HTTP_STATUS.OK,
-          message: AUTH_MESSAGES.LOGIN,
-        })
-      );
+      .status(200)
+      .json(ApiResponse.success(null, AUTH_MESSAGES.LOGIN_SUCCESS));
   }),
 ];
 
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response) => {
     const oldToken = req.cookies.linkora_refresh_token;
-    if (!oldToken) {
-      throw new ApiError({
-        status: HTTP_STATUS.UNAUTHORIZED,
-        message: "Refresh token missing",
-      });
-    }
-    console.log("Refreshing refresh token");
+    if (!oldToken) throw ApiError.Unauthorized(AUTH_MESSAGES.MISSING_TOKEN);
+
     const { newAccessToken, newRefreshToken } =
       await verifyAndRotateRefreshToken(oldToken);
 
-    return res
+    res
       .cookie("linkora_access_token", newAccessToken, accessTokenCookieOptions)
       .cookie(
         "linkora_refresh_token",
         newRefreshToken,
         refreshTokenCookieOptions
       )
-      .status(HTTP_STATUS.OK)
-      .json(
-        new ApiResponse({
-          status: HTTP_STATUS.OK,
-          message: "Token refreshed",
-        })
-      );
+      .status(200)
+      .json(ApiResponse.success(null, AUTH_MESSAGES.TOKEN_REFRESHED));
   }
 );
 
 export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.currentUser;
-
   await handleLogout(id);
 
-  res.clearCookie("linkora_access_token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-  });
+  res.clearCookie("linkora_access_token");
+  res.clearCookie("linkora_refresh_token");
 
-  res.clearCookie("linkora_refresh_token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-  });
-
-  res.status(HTTP_STATUS.OK).json(
-    new ApiResponse({
-      status: HTTP_STATUS.OK,
-      message: AUTH_MESSAGES.logout,
-    })
-  );
+  res.status(200).json(ApiResponse.success(null, AUTH_MESSAGES.LOGOUT_SUCCESS));
 });
 
-export const sendPasswordResetEmail = [
-  body("email").isEmail().withMessage("Invalid email format"),
+export const sendPasswordResetEmail = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
 
-  asyncHandler(async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new ApiError({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: errors.array()[0].msg,
-      });
+    if (!email) {
+      throw ApiError.BadRequest(AUTH_MESSAGES.EMAIL_REQUIRED);
     }
 
-    await handleSendPasswordResetEmail(req.body.email);
+    await handleSendPasswordResetEmail(email);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: AUTH_MESSAGES.EMAIL_SENT,
-      })
-    );
-  }),
-];
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(null, AUTH_MESSAGES.EMAIL_SENT));
+  }
+);
 
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { password, confirmPassword } = req.body;
     const token = req.query.token as string;
+    const { password, confirmPassword } = req.body;
+
+    if (!token || !password || !confirmPassword) {
+      throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
+    }
 
     await handleResetPassword(token, password, confirmPassword);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: AUTH_MESSAGES.PASSWORD_UPDATED,
-      })
-    );
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(null, AUTH_MESSAGES.PASSWORD_UPDATED));
   }
 );
 
 export const getCurentUser = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.currentUser;
+    const user = await getUserById(id);
 
-    const user = await handleGetCurentUser(id);
-
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse({
-        status: HTTP_STATUS.OK,
-        message: USER_MESSAGES.FOUND,
-        data: user,
-      })
-    );
+    res.status(200).json(ApiResponse.success(user, USER_MESSAGES.FOUND));
   }
 );

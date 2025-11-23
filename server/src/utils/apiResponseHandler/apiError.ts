@@ -1,29 +1,32 @@
-interface ApiErrorInterface {
-  status: number;
-  message: string;
-  errors?: string[];
-  stack?: string;
-}
-
 class ApiError extends Error {
   status: number;
-  data: any;
   message: string;
   success: boolean;
-  errors?: string[];
 
-  constructor({ status, message, errors = [], stack = "" }: ApiErrorInterface) {
+  constructor(status: number, message: string) {
     super(message);
     this.status = status;
     this.message = message;
     this.success = false;
-    this.errors = errors.length > 0 ? errors : undefined;
+  }
 
-    if (stack) {
-      this.stack = stack;
-    } else {
-      Error.captureStackTrace(this, this.constructor);
-    }
+  static BadRequest(msg: string) {
+    return new ApiError(400, msg);
+  }
+  static Unauthorized(msg: string) {
+    return new ApiError(401, msg);
+  }
+  static Forbidden(msg: string) {
+    return new ApiError(403, msg);
+  }
+  static NotFound(msg: string) {
+    return new ApiError(404, msg);
+  }
+  static Conflict(msg: string) {
+    return new ApiError(409, msg);
+  }
+  static ServerError(msg = "Something went wrong") {
+    return new ApiError(500, msg);
   }
 }
 

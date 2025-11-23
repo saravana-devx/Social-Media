@@ -39,16 +39,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Security Middlewares
 app.use(mongoSanitize());
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         // scriptSrc: ["'self'", "trusted.cdn.com"],
-//       },
-//     },
-//   })
-// );
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -67,7 +57,10 @@ app.use(
 const allowedOrigins: string[] =
   process.env.NODE_ENV === "production" && process.env.Frontend_Production_url
     ? [process.env.Frontend_Production_url]
-    : ["http://localhost:5173"];
+    : [
+        "http://localhost:5173",
+        "http://192.168.0.100:5173", // Local network access
+      ];
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {

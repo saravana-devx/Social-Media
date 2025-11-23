@@ -16,6 +16,7 @@ const router = Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
 router.post("/logout", authenticateUser, logoutUser);
 router.post("/refresh", refreshToken);
 

@@ -6,10 +6,7 @@ import { HTTP_STATUS, MEDIA_MESSAGES, USER_MESSAGES } from "../constants";
 const validateUserExists = async (userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
-    throw new ApiError({
-      status: HTTP_STATUS.NOT_FOUND,
-      message: USER_MESSAGES.NOT_FOUND,
-    });
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, USER_MESSAGES.NOT_FOUND);
   }
   return user;
 };
@@ -17,10 +14,7 @@ const validateUserExists = async (userId: string) => {
 const validateMediaExists = async (mediaId: string) => {
   const media = await Media.findById(mediaId);
   if (!media) {
-    throw new ApiError({
-      status: HTTP_STATUS.NOT_FOUND,
-      message: MEDIA_MESSAGES.NOT_FOUND,
-    });
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, MEDIA_MESSAGES.NOT_FOUND);
   }
   return media;
 };

@@ -1,24 +1,14 @@
-import { PostsSection } from "@/components/post/PostsSection";
-import {
-  useCurrentUserQuery,
-  useUserPosts,
-} from "@/features/profile/hooks/useUserProfile";
+import { PostSkeleton } from "@/components/feedback/skeleton/PostSkeleton";
+import PostsSection from "@/components/post/PostsSection";
 
-const UserPosts = () => {
-  const { data: userData, isLoading: userLoading } = useCurrentUserQuery();
+import { useUserPostsQuery } from "../hooks/useProfile";
 
-  const userId = userData?.data?._id;
+const UserPosts = ({ userId }: { userId: string }) => {
+  const { data, isLoading } = useUserPostsQuery(userId);
 
-  // We start with cursor = undefined (first page)
-  const { data: postsData, isLoading: postsLoading } = useUserPosts(
-    userId,
-    undefined,
-    10
-  );
+  if (isLoading) return <PostSkeleton />;
 
-  if (userLoading || postsLoading) return <p>Loading posts...</p>;
-
-  return <PostsSection posts={postsData?.data?.posts || []} />;
+  return <PostsSection posts={data?.data?.posts || []} />;
 };
 
 export default UserPosts;

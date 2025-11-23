@@ -1,8 +1,6 @@
-// src/features/auth/pages/LoginPage.tsx
-import React from "react";
 import LoginForm from "../components/LoginForm";
 
-const LoginPage: React.FC = () => {
+const LoginPage = () => {
   return <LoginForm />;
 };
 

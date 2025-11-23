@@ -9,28 +9,28 @@ import { JWTTokenPayload } from "../types/auth.types";
 dotenv.config();
 
 const secret = process.env.JWT_ACCESS_SECRET as string;
+
 const verifyTokenFromCookie = (cookieName: string) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies[cookieName];
+    const token = req.cookies?.[cookieName];
 
     if (!token) {
-      throw new ApiError({
-        status: HTTP_STATUS.UNAUTHORIZED,
-        message: AUTH_MESSAGES.MISSING_TOKEN,
-      });
+      throw new ApiError( HTTP_STATUS.UNAUTHORIZED,AUTH_MESSAGES.MISSING_TOKEN);
     }
 
-    const decode = jwt.verify(token, secret) as JWTTokenPayload;
+    try {
+      const decoded = jwt.verify(token, secret) as JWTTokenPayload;
 
-    if (!decode) {
-      throw new ApiError({
-        status: HTTP_STATUS.CONFLICT,
-        message: AUTH_MESSAGES.ERROR_DECODING_TOKEN,
-      });
+      if (!decoded?.id) {
+        throw new ApiError(HTTP_STATUS.UNAUTHORIZED,AUTH_MESSAGES.INVALID_TOKEN);
+      }
+
+      req.currentUser = decoded;
+      return next();
+    } catch (err) {
+      throw new ApiError( HTTP_STATUS.UNAUTHORIZED,AUTH_MESSAGES.INVALID_OR_EXPIRED_TOKEN);
     }
-    req.currentUser = decode;
-    next();
   });
 
-export const verifyAuth = verifyTokenFromCookie("verification_token");
-export const authenticateUser = verifyTokenFromCookie("linkora_access_token");
+export const verifyAuth = verifyTokenFromCookie("verification_token"); // For verification stage
+export const authenticateUser = verifyTokenFromCookie("linkora_access_token"); // For protected routes

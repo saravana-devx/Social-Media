@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { EditProfileForm, DeleteAccount } from "@/features/settings";
+import EditProfileForm from "../components/EditProfileForm";
+import DeleteAccount from "../components/DeleteAccount";
 
 export default function SettingsPage() {
   return (

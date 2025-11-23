@@ -1,13 +1,11 @@
-import React from "react";
-import { PostLayout } from "@/layout";
-import { StoriesBar } from "@/features/home";
-import CreatePost from "@/components/post/CreatePost";
+import { CreatePost, PostLayout } from "@/components/post";
+import StoryBar from "../components/StoryBar";
 
 const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="px-2 sm:px-0">
-        <StoriesBar />
+        <StoryBar />
         <CreatePost />
         <PostLayout />
         <PostLayout />

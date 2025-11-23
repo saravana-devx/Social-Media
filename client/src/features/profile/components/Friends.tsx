@@ -1,12 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useFriendsList } from "@/features/profile/hooks/useUserProfile";
 
-const FriendsList = () => {
-  const { data, isLoading } = useFriendsList();
+import { useUserFriendsQuery } from "@/hooks/api/useUser";
+
+interface FriendsListProps {
+  userId: string;
+}
+
+const FriendsList = ({ userId }: FriendsListProps) => {
+  const { data, isLoading } = useUserFriendsQuery(userId!);
   const friends = data?.data;
-  console.log("data friends :: ", friends)
 
   if (isLoading) {
     return (
@@ -42,7 +46,10 @@ const FriendsList = () => {
             >
               <div className="flex items-start gap-4">
                 <Avatar className="h-14 w-14 ring-2 ring-border">
-                  <AvatarImage src={friend.profileImage} className="object-cover" />
+                  <AvatarImage
+                    src={friend.profileImage}
+                    className="object-cover"
+                  />
                   <AvatarFallback>
                     {friend.firstName?.[0] || friend.userName?.[0]}
                   </AvatarFallback>
@@ -59,14 +66,17 @@ const FriendsList = () => {
                 </div>
               </div>
 
+              {/* Hide "Remove" button if viewing other user's profile */}
               <div className="flex gap-2">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20"
-                >
-                  Remove
-                </Button>
+                {!userId && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20"
+                  >
+                    Remove
+                  </Button>
+                )}
 
                 <Button
                   size="sm"
@@ -79,9 +89,11 @@ const FriendsList = () => {
           ))}
         </div>
 
-        <Button className="w-full mt-6 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20">
-          Load more Friends
-        </Button>
+        {!userId && (
+          <Button className="w-full mt-6 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20">
+            Load more Friends
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

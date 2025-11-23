@@ -8,61 +8,57 @@ import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
 import { COMMON_MESSAGES, HTTP_STATUS, POST_MESSAGES } from "../utils/constants";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
 
+
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.currentUser.id;
   const { mediaId } = req.params;
   const { description } = req.body;
-
   if (!mediaId || !description) {
-    throw new ApiError({
-      status: HTTP_STATUS.BAD_REQUEST,
-      message: COMMON_MESSAGES.REQUIRED_FIELDS,
-    });
+    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
   }
-
-  await handleCreatePost({
-    userId,
-    mediaId,
-    description,
-  });
-
+  await handleCreatePost({ userId, mediaId, description });
   return res.status(HTTP_STATUS.CREATED).json(
-    new ApiResponse({
-      status: HTTP_STATUS.CREATED,
-      message: POST_MESSAGES.CREATED,
-    })
+    ApiResponse.created(null, POST_MESSAGES.CREATED)
   );
 });
 
-export const updatePost = asyncHandler(
-  async (req: Request, res: Response) => {}
-);
+export const updatePost = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement logic for updating a post
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(null, "Update post endpoint under development"));
+});
 
-// use deleted_by and deleted_at to make a archieve (list of posts)
-export const deletePost = asyncHandler(
-  async (req: Request, res: Response) => {}
-);
+// Soft Delete Post (Archived using deleted_at + deleted_by fields)
+export const deletePost = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement soft delete logic (mark as deleted, not remove)
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(null, "Delete post endpoint under development"));
+});
 
-export const addLike = asyncHandler(async (req: Request, res: Response) => {});
+export const addLike = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement like logic (toggle like / unlike)
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(null, "Like post endpoint under development"));
+});
 
-export const getUserPosts = asyncHandler(
-  async (req: Request, res: Response) => {
-    const userId = req.params.userId;
-    const cursor = req.query.cursor as string;
-    const limit = Number(req.query.limit) || 10;
+export const getUserPosts = asyncHandler(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = Number(req.query.limit) || 10;
 
-    const result = await handleGetPostsByUser(userId, cursor, limit);
+  const result = await handleGetPostsByUser(userId, cursor, limit);
 
-    return res.status(200).json(
-      new ApiResponse({
-        status: 200,
-        message: POST_MESSAGES.FETCHED,
-        data: result,
-      })
-    );
-  }
-);
+  return res.status(HTTP_STATUS.OK).json(
+    ApiResponse.success(result, POST_MESSAGES.FETCH_SUCCESS)
+  );
+});
 
-export const getSavedPost = asyncHandler(
-  async (req: Request, res: Response) => {}
-);
+export const getSavedPost = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement saved post retrieval logic
+  return res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(null, "Get saved posts endpoint under development"));
+});

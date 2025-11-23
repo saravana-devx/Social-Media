@@ -1,9 +1,13 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { FriendsList } from "..";
-import CreatePost from "@/components/post/CreatePost";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserPosts from "./UserPosts";
+import FriendsList from "./Friends";
 
-const ProfileTabs = () => {
+interface ProfileTabsProps {
+  userId: string; // undefined → own profile
+  isOwnProfile: boolean; // passed from ProfilePage
+}
+
+const ProfileTabs = ({ userId }: ProfileTabsProps) => {
   return (
     <Tabs defaultValue="posts" className="w-full mt-6">
       <TabsList className="flex flex-start border-b border-border bg-transparent p-0">
@@ -11,7 +15,7 @@ const ProfileTabs = () => {
           value="posts"
           className="pb-2 rounded-none text-muted-foreground
             data-[state=active]:bg-primary/20 
-          hover:text-foreground"
+            hover:text-foreground"
         >
           Posts
         </TabsTrigger>
@@ -29,7 +33,7 @@ const ProfileTabs = () => {
           value="media"
           className="pb-2 rounded-none text-muted-foreground
             data-[state=active]:bg-primary/20 
-          hover:text-foreground"
+            hover:text-foreground"
         >
           Media
         </TabsTrigger>
@@ -42,24 +46,14 @@ const ProfileTabs = () => {
         >
           Videos
         </TabsTrigger>
-
-        <TabsTrigger
-          value="createPost"
-          className="pb-2 rounded-none text-muted-foreground
-            data-[state=active]:bg-primary/20 
-          hover:text-foreground"
-        >
-          Create Posts
-        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="posts">
-        <UserPosts />
-        <div className="p-4">Post will appear here.</div>
+        <UserPosts userId={userId} />
       </TabsContent>
 
       <TabsContent value="friends">
-        <FriendsList />
+        <FriendsList userId={userId} />
       </TabsContent>
 
       <TabsContent value="media">
@@ -68,10 +62,6 @@ const ProfileTabs = () => {
 
       <TabsContent value="videos">
         <div className="p-4">Videos content here</div>
-      </TabsContent>
-
-      <TabsContent value="createPost">
-        <CreatePost />
       </TabsContent>
     </Tabs>
   );

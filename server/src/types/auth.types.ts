@@ -15,3 +15,11 @@ export type RegisterUserInput = {
   email: string;
   password: string;
 };
+
+export type DeviceMeta = {
+  deviceName?: string;
+  ipAddress?: string;
+  broswerInfo? : string;
+  osInfo? : string;
+  userAgent?: string;
+};

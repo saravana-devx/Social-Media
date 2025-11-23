@@ -8,8 +8,9 @@ export interface AuthUser {
 }
 
 export interface LoginPayload {
-  identifier: string; // username or email
+  usernameOrEmail: string;
   password: string;
+  meta?: DeviceMeta;
 }
 
 export interface RegisterPayload {
@@ -41,3 +42,11 @@ export interface DecodedToken {
   exp: number;
   iat: number;
 }
+
+export type DeviceMeta = {
+  deviceName?: string;
+  ipAddress?: string;
+  broswerInfo?: string;
+  osInfo?: string;
+  userAgent?: string;
+};

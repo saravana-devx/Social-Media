@@ -6,7 +6,6 @@ import {
   TestimonialSection,
   ScrollStorytelling,
   StatsSection,
-  Footer,
 } from "@/features/landing";
 import React from "react";
 
