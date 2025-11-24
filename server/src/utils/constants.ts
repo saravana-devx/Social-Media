@@ -32,9 +32,10 @@ const AUTH_MESSAGES = {
 
   MISSING_TOKEN: "Token is missing.",
   INVALID_TOKEN: "Token is invalid.",
-  INVALID_REFRESH_TOKEN: "INVALID_REFRESH_TOKEN",
+  INVALID_REFRESH_TOKEN: "Invalid refresh token.",
   TOKEN_REFRESHED: "Token refreshed successfully.",
   ERROR_DECODING_TOKEN: "Error decoding token.",
+  INVALID_OR_EXPIRED_REFRESH_TOKEN: "Refresh token is invalid or expired.",
   INVALID_OR_EXPIRED_TOKEN: "Token is invalid or expired.",
 
   EMAIL_REQUIRED: "Email is required.",

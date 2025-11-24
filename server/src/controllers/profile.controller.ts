@@ -16,114 +16,144 @@ import {
 } from "../services/profile.service";
 
 import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
-import { COMMON_MESSAGES, HTTP_STATUS, USER_MESSAGES } from "../utils/constants";
+import {
+  COMMON_MESSAGES,
+  HTTP_STATUS,
+  USER_MESSAGES,
+} from "../utils/constants";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
 
-export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
-  // const userId = req.currentUser.id;
-  const updatedUser = await handleUpdateProfile(req.body);
+export const updateProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    // const userId = req.currentUser.id;
+    const updatedUser = await handleUpdateProfile(req.body);
 
-  res.status(HTTP_STATUS.OK).json(
-    ApiResponse.success(updatedUser, USER_MESSAGES.UPDATE_SUCCESS)
-  );
-});
+    res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(updatedUser, USER_MESSAGES.UPDATE_SUCCESS));
+  }
+);
 
 export const getFriends = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
   const friends = await handleGetFriends(userId);
 
-  res.status(HTTP_STATUS.OK).json(
-    ApiResponse.success(friends, USER_MESSAGES.FOUND)
-  );
+  res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(friends, USER_MESSAGES.FOUND));
 });
 
-export const sendFriendRequest = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { friendId } = req.params;
+export const sendFriendRequest = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { friendId } = req.params;
 
-  const message = await handleSendFriendRequest(userId, friendId);
+    const message = await handleSendFriendRequest(userId, friendId);
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
-});
+    res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+  }
+);
 
-export const acceptFriendRequest = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { requesterId } = req.params;
+export const acceptFriendRequest = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { requesterId } = req.params;
 
-  const message = await handleAcceptFriendRequest(userId, requesterId);
+    const message = await handleAcceptFriendRequest(userId, requesterId);
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
-});
+    res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+  }
+);
 
+export const cancelFriendRequest = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { targetUserId } = req.params;
 
-export const cancelFriendRequest = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { targetUserId } = req.params;
+    const message = await handleCancelFriendRequest(userId, targetUserId);
 
-  const message = await handleCancelFriendRequest(userId, targetUserId);
+    res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+  }
+);
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
-});
+export const rejectFriendRequest = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { requesterId } = req.params;
 
+    const message = await handleRejectFriendRequest(userId, requesterId);
 
-export const rejectFriendRequest = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { requesterId } = req.params;
+    res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+  }
+);
 
-  const message = await handleRejectFriendRequest(userId, requesterId);
+export const removeFriend = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { friendId } = req.params;
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
-});
+    const message = await handleRemoveFriend(userId, friendId);
 
-
-export const removeFriend = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { friendId } = req.params;
-
-  const message = await handleRemoveFriend(userId, friendId);
-
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
-});
-
+    res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, message));
+  }
+);
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.currentUser.id;
   await handleDeleteProfile(userId);
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(null, USER_MESSAGES.DELETE_SUCCESS));
+  res
+    .status(HTTP_STATUS.OK)
+    .json(ApiResponse.success(null, USER_MESSAGES.DELETE_SUCCESS));
 });
 
+export const updateProfileImage = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.currentUser.id;
+    const { secureUrl } = req.body;
 
-export const updateProfileImage = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.currentUser.id;
-  const { secureUrl } = req.body;
+    if (!secureUrl) {
+      throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
+    }
 
-  if (!secureUrl) {
-    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
+    const updatedUser = await handleUpdateProfileImage(userId, secureUrl);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json(
+        ApiResponse.success(
+          updatedUser,
+          USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED
+        )
+      );
   }
+);
 
-  const updatedUser = await handleUpdateProfileImage(userId, secureUrl);
+export const getUserDetail = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { userName } = req.params;
+    const user = await handleGetUserDetail(userName);
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(updatedUser, USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED));
-});
-
-
-export const getUserDetail = asyncHandler(async (req: Request, res: Response) => {
-  const { userName } = req.params;
-  const user = await handleGetUserDetail(userName);
-
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(user, USER_MESSAGES.FOUND));
-});
-
-
-export const getSearchedProfile = asyncHandler(async (req: Request, res: Response) => {
-  const search = req.query.search as string;
-
-  if (!search) {
-    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
+    res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(user, USER_MESSAGES.FOUND));
   }
+);
 
-  const users = await handleSearchProfile(search);
+export const getSearchedProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.currentUser;
 
-  res.status(HTTP_STATUS.OK).json(ApiResponse.success(users, USER_MESSAGES.FOUND));
-});
+    const search = req.query.search as string;
+
+    if (!search) {
+      throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
+    }
+
+    const users = await handleSearchProfile(id, search);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(users, USER_MESSAGES.FOUND));
+  }
+);

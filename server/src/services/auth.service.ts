@@ -143,9 +143,8 @@ export const handleUserLogin = async (
     broswerInfo: meta.broswerInfo,
     osInfo: meta.osInfo,
     userAgent: meta.userAgent,
-
     revoked: false,
-    expiresAt: new Date(decoded.exp * 1000),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
 
   await redisClient.setEx(
@@ -162,30 +161,43 @@ export const handleUserLogin = async (
   return { accessToken, refreshToken };
 };
 
-export async function verifyAndRotateRefreshToken(token: string) {
+export async function verifyAndRotateRefreshToken(oldToken: string) {
   const secret = process.env.JWT_REFRESH_SECRET!;
   let payload: any;
 
   try {
-    payload = verifyToken(token, secret);
+    payload = verifyToken(oldToken, secret);
   } catch {
-    throw ApiError.Unauthorized(AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
+    throw ApiError.Unauthorized(AUTH_MESSAGES.INVALID_OR_EXPIRED_REFRESH_TOKEN);
   }
 
   const tokenRecord = await RefreshTokenModel.findOne({
-    token,
+    token: oldToken,
     revoked: false,
     expiresAt: { $gt: new Date() },
   });
 
-  if (!tokenRecord)
-    throw ApiError.Unauthorized(AUTH_MESSAGES.INVALID_OR_EXPIRED_TOKEN);
+  if (!tokenRecord) {
+    throw ApiError.Unauthorized(AUTH_MESSAGES.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+  }
 
   tokenRecord.revoked = true;
   await tokenRecord.save();
 
   const newAccessToken = generateAccessToken({ id: payload.id });
   const newRefreshToken = generateRefreshToken({ id: payload.id });
+
+  await RefreshTokenModel.create({
+    userId: payload.id,
+    token: newRefreshToken,
+    sessionId: tokenRecord.sessionId,
+    deviceName: tokenRecord.deviceName,
+    ipAddress: tokenRecord.ipAddress,
+    osInfo: tokenRecord.osInfo,
+    userAgent: tokenRecord.userAgent,
+    revoked: false,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
 
   return { newAccessToken, newRefreshToken };
 }

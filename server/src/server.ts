@@ -7,7 +7,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 // To run on all device within same network
-const hostAddress = "192.168.0.100";
+const hostAddress = "192.168.0.101";
 
 connectToDatabase().then(async () => {
   await initRedis();

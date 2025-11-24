@@ -32,7 +32,7 @@ export const useUserPostsQuery = (
   limit: number = 10
 ) => {
   return useQuery({
-    queryKey: ["userPosts", userId, cursor],
+    queryKey: ["posts", userId, cursor],
     queryFn: () => PostAPI.getUserPosts(userId!, cursor, limit),
     enabled: !!userId, // this prevents undefined userId from running the query
     staleTime: 1000 * 60 * 1,

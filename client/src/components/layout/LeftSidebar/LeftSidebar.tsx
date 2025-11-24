@@ -5,29 +5,29 @@ import {
   Users,
   Bell,
   Settings,
-  Newspaper,
   Video,
   MessageSquare,
   Image,
-  PartyPopper,
   ChevronLeft,
   ChevronRight,
+  Search,
+  UserRoundCheck,
 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useLeftSidebar } from "./useLeftSidebar";
 
 const items = [
-  { title: "Feed", url: "/home", icon: Home },
-  { title: "Connections", url: "/connectionList", icon: Users },
-  { title: "Latest News", url: "/news", icon: Newspaper },
-  { title: "Groups", url: "/groups", icon: Users },
-  { title: "Notifications", url: "/notifications", icon: Bell },
-  { title: "Profile", url: "/profile", icon: Settings },
-  { title: "Photos", url: "/photos", icon: Image },
-  { title: "Celebrations", url: "/postmodal", icon: PartyPopper },
-  { title: "Video", url: "/videos", icon: Video },
+  { title: "Home", url: "/home", icon: Home },
+  { title: "Explore", url: "/explore", icon: Search },
   { title: "Chat", url: "/chat", icon: MessageSquare },
+  { title: "Notifications", url: "/notifications", icon: Bell },
+  { title: "Friends", url: "/friendList", icon: Users },
+  { title: "Groups", url: "/groups", icon: Users },
+  { title: "Photos", url: "/photos", icon: Image },
+  { title: "Video", url: "/videos", icon: Video },
+  { title: "Profile", url: "/profile", icon: UserRoundCheck },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 interface LeftSidebarProps {

@@ -8,8 +8,8 @@ import { MediaURL } from "@/api/config";
 import { api } from "@/api/config";
 
 async function getSignature(): Promise<CloudinarySignatureResponse> {
-  const response: AxiosResponse = await api.get(MediaURL.signature);
-  return response.data;
+  const { data }: AxiosResponse = await api.get(MediaURL.signature);
+  return data.data;
 }
 
 // Upload file to Cloudinary
@@ -20,20 +20,27 @@ async function uploadToCloudinary(
   const formData = new FormData();
 
   formData.append("file", file);
+  console.log("timestamp :: ", sig.timestamp);
   formData.append("timestamp", sig.timestamp.toString());
   formData.append("signature", sig.signature);
   formData.append("api_key", sig.apiKey);
 
-  const res = await api.post(
+  const { data } = await api.post(
     MediaURL.uploadToCloudinary(sig.cloudName),
-    formData
+    formData,
+    {
+      withCredentials: false,
+      headers: { "Content-Type": "multipart/form-data" },
+    }
   );
-  return res.data;
+  console.log("data in cloudinary :: ", data);
+  return data;
 }
 
 const saveMediaInDB = async (
   media: CloudinaryUploadedMedia
 ): Promise<SavedMediaInDB> => {
+  console.log("media :: ", media);
   const { data }: AxiosResponse<{ data: SavedMediaInDB }> = await api.post(
     MediaURL.upload,
     media

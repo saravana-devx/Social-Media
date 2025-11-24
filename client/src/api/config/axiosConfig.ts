@@ -4,7 +4,7 @@ import { toast } from "sonner";
 const BACKEND_URL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
-    : "http://192.168.0.100:4000";
+    : "http://192.168.0.101:4000";
 
 export const api = axios.create({
   withCredentials: true,
@@ -118,7 +118,7 @@ api.interceptors.response.use(
         break;
       default:
         // Change the toast message with console.error() in production
-        console.log("Refreshing...............")
+        console.log("Refreshing...............");
         toast.error(error.response?.statusText || "Something went wrong.");
         break;
     }

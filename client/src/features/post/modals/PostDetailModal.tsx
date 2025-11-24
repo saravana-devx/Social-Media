@@ -1,6 +1,4 @@
 import React from "react";
-import { PersonAvatar } from "../layout";
-import Comment from "@/components/layout/CommentLayout";
 import { ImageZoom } from "@/components/ui/shadcn-io/image-zoom";
 
 interface PostMedia {
@@ -33,7 +31,7 @@ interface PostModalProps {
   post: Post | null; // Allow null to prevent crashes
 }
 
-const PostModal: React.FC<PostModalProps> = ({ post }) => {
+const PostDetailModal: React.FC<PostModalProps> = ({ post }) => {
   // If post is null, show fallback UI
   if (!post) {
     return (
@@ -45,7 +43,6 @@ const PostModal: React.FC<PostModalProps> = ({ post }) => {
 
   return (
     <div className="bg-card max-w-3xl mx-auto mt-4 p-6 rounded-xl shadow-md border border-border flex flex-col gap-4 font-sans">
-
       {/* Header */}
       <div className="flex gap-4 items-center">
         {/* <PersonAvatar image={post.userId?.profileImage} view={false} /> */}
@@ -54,7 +51,10 @@ const PostModal: React.FC<PostModalProps> = ({ post }) => {
           <p className="text-foreground font-semibold text-base">
             {post.userId?.userName || "Unknown User"}{" "}
             <span className="text-muted-foreground text-sm">
-              · {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+              ·{" "}
+              {post.createdAt
+                ? new Date(post.createdAt).toLocaleDateString()
+                : ""}
             </span>
           </p>
         </div>
@@ -85,32 +85,8 @@ const PostModal: React.FC<PostModalProps> = ({ post }) => {
           )}
         </div>
       )}
-
-      {/* Actions */}
-      <div className="border-t border-b border-border flex justify-between py-3 text-muted-foreground">
-        <PostAction label={`Liked (${post.likes?.length ?? 0})`}>❤️</PostAction>
-        <PostAction label={`Comments (${post.comments?.length ?? 0})`}>💬</PostAction>
-        <PostAction label={`Share (${post.shares ?? 0})`}>🔁</PostAction>
-        <PostAction label="Send">📤</PostAction>
-      </div>
-
-      <Comment />
     </div>
   );
 };
 
-export default PostModal;
-
-// Reusable Action Component
-const PostAction = ({
-  children,
-  label,
-}: {
-  children: React.ReactNode;
-  label: string;
-}) => (
-  <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
-    {children}
-    <span className="text-sm font-medium">{label}</span>
-  </div>
-);
+export default PostDetailModal;

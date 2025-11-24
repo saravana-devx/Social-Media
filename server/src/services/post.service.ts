@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId, Types } from "mongoose";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
 import { HTTP_STATUS } from "../utils/constants";
 import {
@@ -11,11 +11,16 @@ import { User } from "../models/user.model";
 
 export const handleCreatePost = async (data: createPost) => {
   await validateUserExists(data.userId);
-  await validateMediaExists(data.mediaId);
+  // Validate all mediaIds properly
+  await Promise.all(
+    data.mediaIds.map((id: Types.ObjectId) =>
+      validateMediaExists(id.toString())
+    )
+  );
 
   const post = await Post.create({
     userId: data.userId,
-    media: data.mediaId,
+    media: data.mediaIds,
     description: data.description,
   });
 
@@ -62,4 +67,30 @@ export const handleGetPostsByUser = async (
   }
 
   return { posts, nextCursor };
+};
+
+interface QueryParams {
+  cursor?: string;
+  limit?: number;
+}
+
+export const handleGetPosts = async ({ cursor, limit = 5 }: QueryParams) => {
+  const query: any = {};
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
+
+  const posts = await Post.find(query)
+    .sort({ _id: -1 })
+    .limit(limit + 1)
+    .populate("userId")
+    .populate("media");
+
+  const hasNextPage = posts.length > limit;
+  const nextCursor = hasNextPage ? posts[limit]._id : null;
+
+  return {
+    posts: posts.slice(0, limit),
+    nextCursor,
+  };
 };

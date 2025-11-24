@@ -255,7 +255,7 @@ export const handleGetUserDetail = async (userName: string) => {
   return user[0];
 };
 
-export const handleSearchProfile = async (search: string) => {
+export const handleSearchProfile = async (id : string,search: string) => {
   if (!search?.trim()) return [];
 
   return await User.aggregate([
@@ -266,6 +266,7 @@ export const handleSearchProfile = async (search: string) => {
     },
     {
       $match: {
+        _id: { $ne: new mongoose.Types.ObjectId(id) },
         $or: [
           { userName: { $regex: search, $options: "i" } },
           { fullName: { $regex: search, $options: "i" } },

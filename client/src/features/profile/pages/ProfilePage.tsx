@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { useProfileByUsernameQuery } from "../hooks/useProfile";
 import ProfileHeader from "../components/ProfileHeader";
 import About from "../components/About";
-import { CreatePost } from "@/components/post";
 import SavedMedia from "../components/SavedMedia";
+import CreatePost from "@/components/shared/CreatePost";
 
 const ProfilePage = () => {
   const { userName } = useParams();

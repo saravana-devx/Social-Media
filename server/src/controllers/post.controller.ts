@@ -2,24 +2,27 @@ import type { Request, Response } from "express";
 import asyncHandler from "../middlewares/asyncHandler.middleware";
 import {
   handleCreatePost,
+  handleGetPosts,
   handleGetPostsByUser,
 } from "../services/post.service";
 import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
-import { COMMON_MESSAGES, HTTP_STATUS, POST_MESSAGES } from "../utils/constants";
+import {
+  COMMON_MESSAGES,
+  HTTP_STATUS,
+  POST_MESSAGES,
+} from "../utils/constants";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
-
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.currentUser.id;
-  const { mediaId } = req.params;
-  const { description } = req.body;
-  if (!mediaId || !description) {
-    throw ApiError.BadRequest( COMMON_MESSAGES.REQUIRED_FIELDS);
+  const { description, mediaIds } = req.body;
+  if (!mediaIds || mediaIds.length === 0 || !description) {
+    throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
   }
-  await handleCreatePost({ userId, mediaId, description });
-  return res.status(HTTP_STATUS.CREATED).json(
-    ApiResponse.created(null, POST_MESSAGES.CREATED)
-  );
+  await handleCreatePost({ userId, mediaIds, description });
+  return res
+    .status(HTTP_STATUS.CREATED)
+    .json(ApiResponse.created(null, POST_MESSAGES.CREATED));
 });
 
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
@@ -44,21 +47,40 @@ export const addLike = asyncHandler(async (req: Request, res: Response) => {
     .json(ApiResponse.success(null, "Like post endpoint under development"));
 });
 
-export const getUserPosts = asyncHandler(async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const cursor = req.query.cursor as string | undefined;
-  const limit = Number(req.query.limit) || 10;
+export const getUserPosts = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const cursor = req.query.cursor as string | undefined;
+    const limit = Number(req.query.limit) || 10;
 
-  const result = await handleGetPostsByUser(userId, cursor, limit);
+    const result = await handleGetPostsByUser(userId, cursor, limit);
 
-  return res.status(HTTP_STATUS.OK).json(
-    ApiResponse.success(result, POST_MESSAGES.FETCH_SUCCESS)
-  );
-});
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(ApiResponse.success(result, POST_MESSAGES.FETCH_SUCCESS));
+  }
+);
 
-export const getSavedPost = asyncHandler(async (req: Request, res: Response) => {
-  // TODO: Implement saved post retrieval logic
+export const getSavedPost = asyncHandler(
+  async (req: Request, res: Response) => {
+    // TODO: Implement saved post retrieval logic
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(
+        ApiResponse.success(null, "Get saved posts endpoint under development")
+      );
+  }
+);
+
+export const getPosts = asyncHandler(async (req: Request, res: Response) => {
+  const { cursor, limit } = req.query;
+
+  const result = await handleGetPosts({
+    cursor: cursor as string,
+    limit: Number(limit) || 5,
+  });
+
   return res
     .status(HTTP_STATUS.OK)
-    .json(ApiResponse.success(null, "Get saved posts endpoint under development"));
+    .json(ApiResponse.success(result, "Posts fetched successfully."));
 });

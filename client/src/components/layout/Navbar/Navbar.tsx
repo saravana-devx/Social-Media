@@ -57,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
 
         {/* Logo */}
         <Link
-          to="/"
+          to="/home"
           className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent hover:opacity-80 transition-opacity flex-1 md:flex-initial"
         >
           Linkora

@@ -14,6 +14,7 @@ import { ProfilePage } from "@/features/profile";
 import SettingsPage from "@/features/settings/pages/SettingPage";
 import ChatUI from "@/features/chat/components/Chatui";
 import NotFound from "@/components/feedback/NotFound";
+import { ExplorePage } from "@/features/explore";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
       { path: "/profile/:userName?", element: <ProfilePage /> },
       { path: "/settings", element: <SettingsPage /> },
       { path: "/chat", element: <ChatUI /> },
+      { path: "/explore", element: <ExplorePage /> },
     ],
   },
   {

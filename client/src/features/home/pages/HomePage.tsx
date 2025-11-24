@@ -1,16 +1,14 @@
-import { CreatePost, PostLayout } from "@/components/post";
 import StoryBar from "../components/StoryBar";
+import CreatePost from "@/components/shared/CreatePost";
+import PostFeed from "@/features/post/components/PostFeed";
 
 const HomePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="px-2 sm:px-0">
+    <div className="min-h-screen bg-background w-full flex justify-center">
+      <div className="w-full max-w-[370px] sm:max-w-full px-2 sm:px-4 md:px-6">
         <StoryBar />
         <CreatePost />
-        <PostLayout />
-        <PostLayout />
-        <PostLayout />
-        <PostLayout />
+        <PostFeed />
       </div>
     </div>
   );

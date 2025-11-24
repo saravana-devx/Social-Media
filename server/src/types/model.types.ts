@@ -64,7 +64,7 @@ export interface IReply extends Document {
 
 export interface IPost extends Document {
   userId: Types.ObjectId;
-  media: Types.ObjectId;
+  media: Types.ObjectId[];
   description: string;
   likes: Types.ObjectId[];
   shares: number;

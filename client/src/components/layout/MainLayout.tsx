@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 import { Outlet } from "react-router-dom";
-import CreatePostModal from "@/components/post/CreatePostModal";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import Navbar from "./Navbar/Navbar";
 import RightSideBar from "./RightSideBar/RightSidebar";
+import PostEditorModal from "@/features/post/modals/PostEditorModal";
 
 const MainLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,7 +25,7 @@ const MainLayout: React.FC = () => {
       >
         <Navbar onMobileMenuToggle={() => setMobileMenuOpen(true)} />
 
-        <CreatePostModal />
+        <PostEditorModal />
 
         {/* Mobile Sidebar */}
         <LeftSidebar

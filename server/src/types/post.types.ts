@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export type createPost = {
   userId: string;
-  mediaId: string;
+  mediaIds: Types.ObjectId[];
   // mediaId: Types.ObjectId;
   description: string;
 };

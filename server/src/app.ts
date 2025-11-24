@@ -32,34 +32,13 @@ const rateLimiter = rateLimit({
 });
 app.use(rateLimiter);
 
-// Body Parsing
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Security Middlewares
-app.use(mongoSanitize());
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'", "http://localhost:5173"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "http://localhost:5173"], // Allow Vite's HMR
-        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (CSS-in-JS)
-        imgSrc: ["'self'", "data:"], // Allow base64 images
-        connectSrc: ["'self'", "http://localhost:4000", "ws://localhost:5173"], // For API + Vite HMR
-      },
-    },
-  })
-);
-
 // CORS
 const allowedOrigins: string[] =
   process.env.NODE_ENV === "production" && process.env.Frontend_Production_url
     ? [process.env.Frontend_Production_url]
     : [
         "http://localhost:5173",
-        "http://192.168.0.100:5173", // Local network access
+        "http://192.168.0.101:5173", // Local network access
       ];
 
 const corsOptions: cors.CorsOptions = {
@@ -74,6 +53,43 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [
+          "'self'",
+          "http://localhost:5173",
+          "http://192.168.0.101:5173",
+        ],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "http://localhost:5173",
+          "http://192.168.0.101:5173",
+        ], // Allow Vite's HMR
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (CSS-in-JS)
+        imgSrc: ["'self'", "data:"], // Allow base64 images
+        connectSrc: [
+          "'self'",
+          "http://localhost:4000",
+          "http://192.168.0.101:4000",
+          "ws://localhost:5173",
+          "ws://192.168.0.101:5173",
+        ], // For API + Vite HMR
+      },
+    },
+  })
+);
+
+// Body Parsing
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Security Middlewares
+app.use(mongoSanitize());
 
 // ===============================================
 // Routes will be here

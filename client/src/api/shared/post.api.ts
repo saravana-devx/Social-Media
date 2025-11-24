@@ -9,11 +9,34 @@ export const PostAPI = {
     );
     return response.data;
   },
-  publishPost: async (mediaId: string, description: string) => {
-    console.log("media id in publishPost :: ", mediaId);
-    const response = await api.post(`/post/create/${mediaId}`, {
+  publishPost: async (mediaIds: string[], description: string) => {
+    console.log("media id in publishPost :: ", mediaIds);
+    const { data }: AxiosResponse = await api.post(PostURL.createPost, {
+      mediaIds,
       description,
     });
+    return data;
+  },
+  getPosts: async (cursor?: string, limit = 10) => {
+    const response = await api.get("/post/getPosts", {
+      params: { cursor, limit },
+    });
+    return response.data.data;
+  },
+  updatePost: async (
+    postId: string,
+    mediaId: string | undefined,
+    description: string
+  ) => {
+    const response = await api.put(`/post/update/${postId}`, {
+      mediaId,
+      description,
+    });
+    return response.data;
+  },
+
+  deletePost: async (postId: string) => {
+    const response = await api.delete(`/post/${postId}`);
     return response.data;
   },
 };
