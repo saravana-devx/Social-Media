@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export type UpdateProfile = {
   id: string;
   firstName: string;
@@ -9,3 +11,4 @@ export type UpdateProfile = {
   location: string;
   about: string;
 };
+

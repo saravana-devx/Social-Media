@@ -74,6 +74,7 @@ const USER_MESSAGES = {
   USERNAME_EXISTS: "Username is already in use.",
   NO_DATA_PROVIDED: "No data provided.",
   PROFILE_IMAGE_UPDATE_FAILED: "Failed to update profile image.",
+  PROFILE_IMAGE_UPDATE_SUCCESS : "Successfully updated profile image."
 };
 
 const FRIEND_MESSAGES = {
@@ -93,6 +94,8 @@ const FRIEND_MESSAGES = {
 const POST_MESSAGES = {
   CREATED: "Post created successfully.",
   FETCH_SUCCESS: "Posts fetched successfully.",
+  NOT_FOUND: "Post not found.",
+  OWN_POST: "You can't like your own post.",
 };
 
 const MEDIA_MESSAGES = {

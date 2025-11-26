@@ -1,38 +1,8 @@
 import React from "react";
 import { ImageZoom } from "@/components/ui/shadcn-io/image-zoom";
-
-interface PostMedia {
-  _id: string;
-  url: string;
-  resource_type: "image" | "video";
-  format: string;
-  width?: number;
-  height?: number;
-}
-
-interface User {
-  _id: string;
-  userName: string;
-  profileImage?: string;
-}
-
-interface Post {
-  _id: string;
-  userId: User;
-  media?: PostMedia;
-  description: string;
-  likes: any[];
-  comments: any[];
-  shares?: number;
-  createdAt: string;
-}
-
-interface PostModalProps {
-  post: Post | null; // Allow null to prevent crashes
-}
+import type { PostModalProps } from "../types";
 
 const PostDetailModal: React.FC<PostModalProps> = ({ post }) => {
-  // If post is null, show fallback UI
   if (!post) {
     return (
       <div className="text-center text-muted-foreground p-6">
@@ -60,12 +30,10 @@ const PostDetailModal: React.FC<PostModalProps> = ({ post }) => {
         </div>
       </div>
 
-      {/* Description */}
       <div className="text-foreground text-base">
         <p>{post.description}</p>
       </div>
 
-      {/* Media */}
       {post.media?.url && (
         <div className="rounded-lg overflow-hidden shadow-sm">
           {post.media.resource_type === "image" ? (

@@ -26,6 +26,7 @@ import {
   generateRefreshToken,
   verifyToken,
 } from "../utils/helper/generateVerifyJwtToken";
+import { normalizeLocation } from "../utils/helper/locationValidator";
 
 export const registerNewUser = async ({
   userName,
@@ -143,6 +144,7 @@ export const handleUserLogin = async (
     broswerInfo: meta.broswerInfo,
     osInfo: meta.osInfo,
     userAgent: meta.userAgent,
+    location: normalizeLocation(meta.location),
     revoked: false,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
@@ -244,9 +246,29 @@ export const getUserById = async (userId: string) => {
   const cached = await redisClient.get(`user:${userId}`);
   if (cached) return JSON.parse(cached);
 
-  const user = await User.findById(userId).select("-password");
+  // const user = await User.findById(userId).select("-password");
+
+  const user = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+    {
+      $project: {
+        firstName: 1,
+        lastName: 1,
+        userName: 1,
+        email: 1,
+        phoneNumber: 1,
+        dob: 1,
+        profileImage: 1,
+        about: 1,
+        location: 1,
+        joiningDate: 1,
+        friendsCount: { $size: "$friends" },
+      },
+    },
+  ]);
+
   if (!user) throw ApiError.NotFound(USER_MESSAGES.NOT_FOUND);
 
-  await redisClient.setEx(`user:${userId}`, 1800, JSON.stringify(user));
-  return user;
+  await redisClient.setEx(`user:${userId}`, 1800, JSON.stringify(user[0]));
+  return user[0];
 };

@@ -1,6 +1,6 @@
 import mongoose, { ObjectId, Types } from "mongoose";
 import { ApiError } from "../utils/apiResponseHandler/apiError";
-import { HTTP_STATUS } from "../utils/constants";
+import { HTTP_STATUS, POST_MESSAGES } from "../utils/constants";
 import {
   validateMediaExists,
   validateUserExists,
@@ -93,4 +93,22 @@ export const handleGetPosts = async ({ cursor, limit = 5 }: QueryParams) => {
     posts: posts.slice(0, limit),
     nextCursor,
   };
+};
+
+export const handleLike = async (id: string, postId: string) => {
+  const post = await Post.findById(postId);
+  const isPostOwner = post?.userId.toString() === id;
+  if (isPostOwner) {
+    throw ApiError.BadRequest("You can't like your own post.");
+  }
+  const isLiked = post?.likes.includes(new Types.ObjectId(id));
+  const updatedPost = await Post.findByIdAndUpdate(
+    postId,
+    isLiked ? { $pull: { likes: id } } : { $addToSet: { likes: id } },
+    { new: true }
+  );
+  if (!updatedPost) {
+    throw ApiError.NotFound(POST_MESSAGES.NOT_FOUND);
+  }
+  return { updatedPost, isLiked };
 };

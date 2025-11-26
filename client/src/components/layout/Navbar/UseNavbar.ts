@@ -5,8 +5,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const useNavbar = () => {
-  const { data } = useCurrentUserQuery();
-  const user = data?.data;
+  const { data : user } = useCurrentUserQuery();
   const navigate = useNavigate();
 
   const { mutate: logoutUser, isPending } = useLogout();

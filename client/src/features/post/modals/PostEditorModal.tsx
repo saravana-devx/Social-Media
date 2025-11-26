@@ -19,15 +19,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { closePostModal } from "@/store/slices/postModal.slice";
+import { closePostModal } from "@/store/slices/postEditorModal.slice";
 import { useCurrentUserQuery } from "@/hooks/api/useUser";
-import { useCreatePostMutation } from "@/hooks/api/usePost";
-import { toast } from "sonner";
 
-import { usePostMediaUpload } from "@/features/post/hooks/usePostMediaUpload";
+import { usePostMediaUpload } from "../hooks/usePostMediaUpload";
+import { useCreatePostMutation } from "../hooks/usePost";
 
 const PostEditorModal = () => {
   const { isOpen } = useSelector((state: any) => state.postModal);
@@ -87,13 +87,19 @@ const PostEditorModal = () => {
 
             <div className="max-h-[70vh] overflow-y-auto p-4 space-y-4">
               <div className="flex items-start gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={user?.profileImage} />
-                  <AvatarFallback>
-                    {user?.firstName?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                <Avatar className="w-11 h-11 ring-2 ring-slate-100">
+                  <AvatarImage
+                    src={user?.profileImage}
+                    alt="User avatar"
+                    className="w-full h-full rounded-full object-cover"
+                  />
                 </Avatar>
-                <p className="font-semibold">@{user?.userName}</p>
+                <div>
+                  <p className="font-semibold">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="font-semibold">@{user?.userName}</p>
+                </div>
               </div>
 
               <div className="rounded-xl overflow-hidden">

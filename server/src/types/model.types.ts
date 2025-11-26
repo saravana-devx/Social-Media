@@ -22,6 +22,14 @@ export interface IUser extends Document {
   savedPosts: Types.ObjectId[];
 }
 
+export interface Location {
+  country?: string;
+  region?: string;
+  city?: string;
+  lat?: string;
+  lon?: string;
+}
+
 export interface IRefreshToken extends Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
@@ -30,8 +38,9 @@ export interface IRefreshToken extends Document {
   deviceName?: string;
   userAgent?: string;
   ipAddress?: string;
-  browserInfo? : string;
-  osInfo? : string;
+  browserInfo?: string;
+  osInfo?: string;
+  location?: Location;
   revoked: boolean;
   expiresAt: Date;
   replacedByToken?: Types.ObjectId | null;

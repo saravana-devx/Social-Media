@@ -10,7 +10,7 @@ const initialState: PostModalState = {
   editingPost: null,
 };
 
-const postModalSlice = createSlice({
+const postEditorModalSlice = createSlice({
   name: "postModal",
   initialState,
   reducers: {
@@ -25,5 +25,5 @@ const postModalSlice = createSlice({
   },
 });
 
-export const { openPostModal, closePostModal } = postModalSlice.actions;
-export default postModalSlice.reducer;
+export const { openPostModal, closePostModal } = postEditorModalSlice.actions;
+export default postEditorModalSlice.reducer;

@@ -18,7 +18,7 @@ export default function RightSideBar() {
 
   return (
     <div
-      className={`hidden lg:flex fixed top-[73px] right-0 h-[calc(100vh-73px)] bg-card border-l border-border shadow-xl transition-all duration-300 z-30 flex-col
+      className={`hidden sm:mr-3 lg:flex fixed top-[73px] right-0 h-[calc(100vh-73px)] bg-card border-l border-border shadow-xl transition-all duration-300 z-30 flex-col
       ${isCollapsed ? "w-16" : "w-64"}`}
     >
       <button

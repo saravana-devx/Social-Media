@@ -43,10 +43,19 @@ export interface DecodedToken {
   iat: number;
 }
 
+export interface Location {
+  country?: string;
+  region?: string;
+  city?: string;
+  lat?: string;
+  lon?: string;
+}
+
 export type DeviceMeta = {
   deviceName?: string;
   ipAddress?: string;
   broswerInfo?: string;
   osInfo?: string;
   userAgent?: string;
+  location?: string | Location;
 };

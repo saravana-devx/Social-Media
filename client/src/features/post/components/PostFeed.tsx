@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import PostLayout from "./PostCard";
 import { Loader2 } from "lucide-react";
-import { useInfinitePosts } from "@/hooks/api/usePost";
+import { useInfinitePosts } from "@/features/post/hooks/usePost";
 
 const PostFeed = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =

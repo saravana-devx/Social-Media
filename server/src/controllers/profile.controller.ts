@@ -25,8 +25,9 @@ import { ApiError } from "../utils/apiResponseHandler/apiError";
 
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
-    // const userId = req.currentUser.id;
-    const updatedUser = await handleUpdateProfile(req.body);
+    const userId = req.currentUser.id;
+    
+    const updatedUser = await handleUpdateProfile(req.body, userId);
 
     res
       .status(HTTP_STATUS.OK)
@@ -123,7 +124,7 @@ export const updateProfileImage = asyncHandler(
       .json(
         ApiResponse.success(
           updatedUser,
-          USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED
+          USER_MESSAGES.PROFILE_IMAGE_UPDATE_SUCCESS
         )
       );
   }

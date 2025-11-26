@@ -128,7 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="relative group">
+              <button className="relative group select-none">
                 <Avatar className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 cursor-pointer ring-2 ring-border hover:ring-primary transition-all duration-300 group-hover:scale-105">
                   <AvatarImage
                     src={user?.profileImage}
@@ -143,10 +143,9 @@ const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              className="w-72 sm:w-80 p-4 rounded-2xl shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border z-50"
+              className="select-none w-72 sm:w-80 p-4 rounded-2xl shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border z-50"
               align="end"
             >
-              {/* User Info */}
               <DropdownMenuGroup className="flex items-center gap-3 sm:gap-4 p-3 mb-3 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl">
                 <Avatar className="w-14 h-14 sm:w-16 sm:h-16 ring-4 ring-primary/20">
                   <AvatarImage
@@ -183,7 +182,6 @@ const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
                 Account
               </DropdownMenuLabel>
 
-              {/* Settings */}
               <DropdownMenuItem
                 onClick={() => navigate("/settings")}
                 className="flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-3 cursor-pointer"
@@ -199,7 +197,6 @@ const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
                 </div>
               </DropdownMenuItem>
 
-              {/* Help */}
               <DropdownMenuItem
                 onClick={() => navigate("/support")}
                 className="flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-3 cursor-pointer"

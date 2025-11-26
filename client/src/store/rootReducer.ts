@@ -1,13 +1,11 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-import postModalReducer from "./slices/postModal.slice";
-// import other reducers here...
+import postModalReducer from "./slices/postEditorModal.slice";
+import postViewModalReducer from "./slices/postViewModal.slice";
 
 const rootReducer = combineReducers({
   postModal: postModalReducer,
-  // auth: authReducer,
-  // user: userReducer,
-  // theme: themeReducer,
+  postViewModal: postViewModalReducer,
 });
 
 export default rootReducer;

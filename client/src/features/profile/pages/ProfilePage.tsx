@@ -11,13 +11,13 @@ const ProfilePage = () => {
 
   const { data: currentUserData, isLoading: loadingCurrent } =
     useCurrentUserQuery();
-
+  console.log("current user data :: ", currentUserData)
   const { data: searchedUserData, isLoading: loadingSearched } =
     useProfileByUsernameQuery(userName!);
   const isOwnProfile =
-    !userName || currentUserData?.data?.userName === userName;
+    !userName || currentUserData?.userName === userName;
 
-  const user = isOwnProfile ? currentUserData?.data : searchedUserData?.data;
+  const user = isOwnProfile ? currentUserData : searchedUserData;
 
   if (!user || loadingCurrent || (userName && loadingSearched))
     return <p>Loading profile...</p>;

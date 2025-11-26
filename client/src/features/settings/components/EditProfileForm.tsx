@@ -19,14 +19,13 @@ import { useCurrentUserQuery } from "@/hooks/api/useUser";
 import { useUpdateProfileMutation } from "../hooks/useSettings";
 
 const EditProfileForm = () => {
-  const { data, isLoading } = useCurrentUserQuery();
+  const { data : user, isLoading } = useCurrentUserQuery();
   const {
     mutate: updateProfile,
     isPending,
     error,
   } = useUpdateProfileMutation();
 
-  const user = data?.data;
 
   const form = useForm<EditProfilePayload>({
     resolver: zodResolver(editProfileSchema),

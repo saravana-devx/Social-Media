@@ -1,73 +1,68 @@
-import { Heart, MessageCircle, Share2, Send, Check } from "lucide-react";
-import { useState } from "react";
-interface PostActionProps {
-  icon: React.ElementType;
-  label?: string | number;
-  onClick?: () => void;
-  className?: string;
-}
+import { Heart, MessageCircle, Share2, Send } from "lucide-react";
+import { useEffect, useState, type FC } from "react";
+import { useToggleLikeMutation } from "../hooks/usePost";
+import { useThrottleFn } from "@/hooks/ui/useThrottleFn";
+import { useCurrentUserQuery } from "@/hooks";
 
-const PostAction: React.FC<PostActionProps> = ({
-  icon: Icon,
-  label,
-  onClick,
-  className,
-}) => {
-  return (
-    <div
-      onClick={onClick}
-      className={`flex items-center gap-2 cursor-pointer hover:text-primary transition-colors ${className}`}
-    >
-      <Icon className="w-5 h-5" strokeWidth={1.5} />
-      {label && <span className="text-sm font-medium">{label}</span>}
-    </div>
-  );
+type PostActionBarProps = {
+  postId: string;
+  likes: string[];
+  comments: string[];
 };
 
-const PostActionsBar = ({ postUrl = window.location.href }) => {
-  const [isCopied, setIsCopied] = useState(false);
+const PostActionBar: FC<PostActionBarProps> = ({ postId, likes, comments }) => {
+  const { data: user } = useCurrentUserQuery();
+  const userId = user._id;
 
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(postUrl);
-      setIsCopied(true);
+  const [isLiked, setIsLiked] = useState(() => likes.includes(userId));
+  const [likesCount, setLikesCount] = useState(likes.length);
 
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy URL:", err);
-    }
+  const { mutate: toggleLike } = useToggleLikeMutation();
+
+  useEffect(() => {
+    setIsLiked(likes.includes(userId));
+    setLikesCount(likes.length);
+  }, [likes, userId]);
+
+  const handleLikeAction = () => {
+    setIsLiked((prev) => !prev);
+    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+    toggleLike(postId);
   };
 
+  const throttledToggleLike = useThrottleFn(handleLikeAction, 800);
+
   return (
-    <div className="border-t border-b border-border py-2 sm:py-3 text-muted-foreground">
+    <div className="border-t border-b border-border select-none py-2 sm:py-3 text-muted-foreground">
       <div className="flex justify-between items-center px-2">
-        <PostAction
-          icon={Heart}
-          label="Liked (56)"
-          onClick={() => console.log("Like clicked")}
-        />
+        <div
+          onClick={throttledToggleLike}
+          className="flex items-center gap-2 cursor-pointer transition-all duration-200"
+        >
+          <Heart
+            className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+            strokeWidth={1.5}
+          />
+          <span>Likes ({likesCount})</span>
+        </div>
 
-        <PostAction
-          icon={MessageCircle}
-          label="Comments (12)"
-          onClick={() => console.log("Comment clicked")}
-        />
+        <div className="flex items-center gap-2 cursor-pointer text-gray-500">
+          <MessageCircle className="w-5 h-5" />
+          <span>Comments ({comments ? comments?.length : 0})</span>
+        </div>
 
-        <PostAction
-          icon={isCopied ? Check : Share2}
-          label={isCopied ? "Copied!" : "Share (3)"}
-          onClick={handleShare}
-          className={isCopied ? "text-green-500 hover:text-green-600" : ""}
-        />
+        <div className="flex items-center gap-2 cursor-pointer text-gray-500">
+          <Share2 className="w-5 h-5" />
+          <span>Share</span>
+        </div>
 
-        <PostAction
-          icon={Send}
-          label="Send"
-          onClick={() => console.log("Send clicked")}
-        />
+        <div className="flex items-center gap-2 cursor-pointer text-gray-500">
+          <Send className="w-5 h-5" />
+          <span>Send</span>
+        </div>
       </div>
     </div>
   );
 };
 
-export default PostActionsBar;
+export default PostActionBar;

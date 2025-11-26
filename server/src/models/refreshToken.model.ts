@@ -12,6 +12,13 @@ const refreshTokenSchema = new Schema<IRefreshToken>(
     browserInfo: String,
     osInfo: String,
     userAgent: String,
+    location: {
+      country: { type: String, default: null },
+      region: { type: String, default: null },
+      city: { type: String, default: null },
+      lat: { type: String, default: null },
+      lon: { type: String, default: null },
+    },
 
     revoked: { type: Boolean, default: false, index: true },
     expiresAt: { type: Date, required: true, index: true },

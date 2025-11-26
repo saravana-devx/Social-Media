@@ -8,7 +8,9 @@ export const getActiveSessions = async (userId: string) => {
   const sessions = await RefreshTokenModel.find({
     userId,
     revoked: false,
-  }).select("sessionId deviceName ipAddress userAgent createdAt");
+  }).select(
+    "sessionId deviceName ipAddress  osInfo userAgent location createdAt"
+  );
 
   return sessions;
 };
@@ -26,6 +28,12 @@ export const revokeSessionById = async (userId: string, sessionId: string) => {
   await redisClient.del(`session:${sessionId}`);
 };
 
+export const getCurrentSessionInfo = async (token: string) => {
+  return await RefreshTokenModel.findOne({ token }).select(
+    "sessionId deviceName userAgent ipAddress createdAt"
+  );
+};
+
 export const logoutAllExceptCurrentService = async (
   userId: string,
   currentSessionId: string
@@ -41,10 +49,4 @@ export const logoutAllExceptCurrentService = async (
       await redisClient.del(key);
     }
   }
-};
-
-export const getCurrentSessionInfo = async (token: string) => {
-  return await RefreshTokenModel.findOne({ token }).select(
-    "sessionId deviceName userAgent ipAddress createdAt"
-  );
 };

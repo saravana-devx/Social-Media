@@ -8,10 +8,10 @@ import {
 
 const router = Router();
 
-router.get("/sessions", authenticateUser, getSessions);
-router.delete("/sessions/:sessionId", authenticateUser, deleteSession);
+router.get("/", authenticateUser, getSessions);
+router.delete("/:sessionId", authenticateUser, deleteSession);
 router.post(
-  "/sessions/logout-all-except-current",
+  "/logout-all-except-current",
   authenticateUser,
   logoutAllExceptCurrent
 );

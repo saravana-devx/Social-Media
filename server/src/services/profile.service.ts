@@ -10,9 +10,13 @@ import {
   USER_MESSAGES,
 } from "../utils/constants";
 import { validateUserExists } from "../utils/helper/dbValidators";
+import { redisClient } from "../config/redis.config";
 
-export const handleUpdateProfile = async (data: UpdateProfile) => {
-  await validateUserExists(data.id);
+export const handleUpdateProfile = async (
+  data: UpdateProfile,
+  userId: string
+) => {
+  await validateUserExists(userId);
 
   const updatePayload = {
     ...(data.firstName && { firstName: data.firstName }),
@@ -28,10 +32,12 @@ export const handleUpdateProfile = async (data: UpdateProfile) => {
   }
 
   const updatedUser = await User.findByIdAndUpdate(
-    data.id,
+    userId,
     { $set: updatePayload },
     { new: true }
   ).select("-password");
+  
+  await redisClient.del(`user:${userId}`);
 
   if (!updatedUser) {
     throw ApiError.ServerError(USER_MESSAGES.UPDATE_FAILED);
@@ -223,8 +229,10 @@ export const handleUpdateProfileImage = async (
     { new: true }
   ).select("-password");
 
+  await redisClient.del(`user:${userId}`);
+
   if (!updated) {
-    throw ApiError.ServerError(USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED);
+    throw ApiError.NotFound(USER_MESSAGES.PROFILE_IMAGE_UPDATE_FAILED);
   }
 
   return updated;
@@ -255,7 +263,7 @@ export const handleGetUserDetail = async (userName: string) => {
   return user[0];
 };
 
-export const handleSearchProfile = async (id : string,search: string) => {
+export const handleSearchProfile = async (id: string, search: string) => {
   if (!search?.trim()) return [];
 
   return await User.aggregate([

@@ -13,3 +13,6 @@ export {
   useSearchedProfileQuery,
   useUserFriendsQuery,
 } from "./api/useUser";
+
+//Redux hooks
+export { useAppSelector, useAppDispatch } from "./redux.hook";

@@ -10,15 +10,17 @@ dotenv.config();
 import errorMiddleware from "./middlewares/errorHandler.middleware";
 
 import authRoute from "./routes/auth.route";
+import sessionRoute from "./routes/session.route";
 import mediaRoute from "./routes/media.route";
 import profileRoute from "./routes/profile.route";
 import postRoute from "./routes/post.route";
+import commentRoute from "./routes/comment.route";
 
 export const app: express.Application = express();
 
 // Rate-Limiting
 const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 150 * 60 * 1000,
   max: 500,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -94,9 +96,11 @@ app.use(mongoSanitize());
 // ===============================================
 // Routes will be here
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/sessions", sessionRoute);
 app.use("/api/v1/profile", profileRoute);
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/post", postRoute);
+app.use("/api/v1/comment", commentRoute);
 // ===============================================
 
 app.use(errorMiddleware);

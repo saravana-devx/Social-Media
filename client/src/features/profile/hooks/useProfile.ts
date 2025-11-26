@@ -10,21 +10,14 @@ export const useUpdateProfileImageMutation = () => {
   return useMutation({
     mutationFn: (url: string) => ProfileAPI.updateProfilePicture(url),
     onSuccess: () => {
+      console.log("invalid query");
       qc.invalidateQueries({ queryKey: ["currentUser"] });
+      console.log("query invalidated successfully.");
+      // qc.refetchQueries({ queryKey: ["currentUser"], type: "active" });
     },
     onError: handleAxiosError,
   });
 };
-
-// export const useUserFriendsQuery = (userId: string) => {
-//   return useQuery({
-//     queryKey: ["userFriends", userId],
-//     queryFn: () => ProfileAPI.fetchUserFriends(userId),
-//     enabled: !!userId,
-//     staleTime: 1000 * 60 * 1,
-//     gcTime: 1000 * 60 * 5,
-//   });
-// };
 
 export const useUserPostsQuery = (
   userId: string | undefined,
@@ -39,23 +32,6 @@ export const useUserPostsQuery = (
     gcTime: 1000 * 60 * 5,
   });
 };
-
-// export const useCreatePostMutation = () => {
-//   const qc = useQueryClient();
-//   return useMutation({
-//     mutationFn: ({
-//       mediaId,
-//       description,
-//     }: {
-//       mediaId: string;
-//       description: string;
-//     }) => PostAPI.publishPost(mediaId, description),
-
-//     onSuccess: () => {
-//       qc.invalidateQueries({ queryKey: ["userPosts"] });
-//     },
-//   });
-// };
 
 export const useProfileByUsernameQuery = (username: string) => {
   return useQuery({

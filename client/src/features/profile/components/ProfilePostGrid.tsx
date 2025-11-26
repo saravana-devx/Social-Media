@@ -2,11 +2,11 @@ import { useState } from "react";
 // import PostModal from "./PostModal";
 import { MoreVertical, Trash, Edit } from "lucide-react";
 import { useCurrentUserQuery } from "@/hooks/api/useUser";
-import { useDeletePostMutation } from "@/hooks/api/usePost";
+import { useDeletePostMutation } from "@/features/post/hooks/usePost";
 import FALLBACK_IMAGE from "@/assets/Images/marie-michele-bouchard-3U9BCWHMhUw-unsplash.jpg";
 import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
-import { openPostModal } from "@/store/slices/postModal.slice";
+import { openPostModal } from "@/store/slices/postEditorModal.slice";
 
 interface PostMedia {
   _id: string;
@@ -54,7 +54,6 @@ const ProfilePostGrid = ({ posts, isOwner }: PostsSectionProps) => {
   };
 
   const getThumbnail = (media: Post["media"]): string => {
-    console.log("thumbnail image :: ", media[0]);
     if (!media[0]?.url) return FALLBACK_IMAGE;
 
     if (media[0].resource_type === "video" && media[0].public_id) {

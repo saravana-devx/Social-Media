@@ -21,7 +21,7 @@ const ReplySchema = new Schema<IReply>({
   ],
   createdAt: {
     type: Date,
-    efault: Date.now,
+    default: Date.now,
   },
 });
 

@@ -1,60 +1,77 @@
-import { useState } from "react";
+import { api } from "@/api/config";
 
-export interface CommentReply {
-  image: string;
-  name: string;
-  description: string;
-  posted: string;
-}
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export interface CommentItem {
-  image: string;
-  name: string;
-  description: string;
-  posted: string;
-  commentedOnComment: CommentReply[];
-}
-
-export const useComments = () => {
-  const [comments, setComments] = useState<CommentItem[]>([
-    // ⚠️ Mock data moved from UI file
-    {
-      image: "/dummy/img1.png",
-      name: "Frances Guerrero",
-      description: "...",
-      posted: "5hr",
-      commentedOnComment: [...],
+export const useCreateCommentMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      commentText,
+    }: {
+      postId: string;
+      commentText: string;
+    }) => {
+      const { data } = await api.post(`/comment/create/${postId}`, {
+        commentText,
+      });
+      return data;
     },
-    ...
-  ]);
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ["comments", variables.postId] });
+    },
+  });
+};
 
-  const [newComment, setNewComment] = useState("");
+export const useCreateReplyMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      commentId,
+      replyText,
+    }: {
+      postId: string;
+      commentId: string;
+      replyText: string;
+    }) => {
+      const { data } = await api.post(
+        `/comment/create-comment-reply/${commentId}`,
+        { replyText }
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      console.log("variables :: ", variables);
+      qc.invalidateQueries({ queryKey: ["comments", variables.postId] });
+    },
+  });
+};
 
-  const handlePostComment = () => {
-    if (!newComment.trim()) return;
-    setComments([
-      {
-        image: "/dummy/newUser.jpg",
-        name: "You",
-        description: newComment,
-        posted: "Just now",
-        commentedOnComment: [],
-      },
-      ...comments,
-    ]);
-    setNewComment("");
-  };
+export const useToggleCommentLikeMutation = () => {
+  return useMutation({
+    mutationFn: async (commentId: string) => {
+      const { data } = await api.patch(`/comment/like-comment/${commentId}`);
+      return data;
+    },
+  });
+};
 
-  const autoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.currentTarget.style.height = "auto";
-    e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
-  };
+export const useToggleReplyLikeMutation = () => {
+  return useMutation({
+    mutationFn: async (replyId: string) => {
+      const { data } = await api.patch(`/comment/like-reply/${replyId}`);
+      return data;
+    },
+  });
+};
 
-  return {
-    comments,
-    newComment,
-    setNewComment,
-    handlePostComment,
-    autoGrow,
-  };
+export const useCommentQuery = (postId: string) => {
+  return useQuery({
+    queryKey: ["comments", postId],
+    queryFn: async () => await api.get(`/comment/get-comments/${postId}`),
+    // enabled: !postId,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
+  });
 };

@@ -1,7 +1,13 @@
 import { Media } from "../../models/media.model";
+import { Post } from "../../models/post.model";
 import { User } from "../../models/user.model";
 import { ApiError } from "../apiResponseHandler/apiError";
-import { HTTP_STATUS, MEDIA_MESSAGES, USER_MESSAGES } from "../constants";
+import {
+  HTTP_STATUS,
+  MEDIA_MESSAGES,
+  POST_MESSAGES,
+  USER_MESSAGES,
+} from "../constants";
 
 const validateUserExists = async (userId: string) => {
   const user = await User.findById(userId);
@@ -19,4 +25,12 @@ const validateMediaExists = async (mediaId: string) => {
   return media;
 };
 
-export { validateUserExists, validateMediaExists };
+const ValidatePostExists = async (postId: string) => {
+  const post = await Post.findById(postId);
+  if (!post) {
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, POST_MESSAGES.NOT_FOUND);
+  }
+  return post;
+};
+
+export { validateUserExists, validateMediaExists, ValidatePostExists };

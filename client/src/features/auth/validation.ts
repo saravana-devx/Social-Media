@@ -17,7 +17,10 @@ export const loginSchema = z.object({
 
 // Register form schema
 export const registerSchema = z.object({
-  userName: z.string().min(4, "Username must be at least 4 characters"),
+  userName: z
+    .string()
+    .min(4, "Username must be at least 4 characters")
+    .max(20, "Enter a valid userName or email less than 20 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });

@@ -4,6 +4,7 @@ import {
   handleCreatePost,
   handleGetPosts,
   handleGetPostsByUser,
+  handleLike,
 } from "../services/post.service";
 import { ApiResponse } from "../utils/apiResponseHandler/apiResponse";
 import {
@@ -40,11 +41,21 @@ export const deletePost = asyncHandler(async (req: Request, res: Response) => {
     .json(ApiResponse.success(null, "Delete post endpoint under development"));
 });
 
-export const addLike = asyncHandler(async (req: Request, res: Response) => {
-  // TODO: Implement like logic (toggle like / unlike)
+export const toggleLike = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.currentUser;
+  const { postId } = req.params;
+  if (!postId) throw ApiError.BadRequest(COMMON_MESSAGES.REQUIRED_FIELDS);
+
+  const { updatedPost, isLiked } = await handleLike(id, postId);
+
   return res
     .status(HTTP_STATUS.OK)
-    .json(ApiResponse.success(null, "Like post endpoint under development"));
+    .json(
+      ApiResponse.success(
+        updatedPost,
+        `Post successfully ${isLiked ? "unliked" : "liked"}`
+      )
+    );
 });
 
 export const getUserPosts = asyncHandler(
